@@ -5,5 +5,5 @@ class SpriteRegistry(Registry):
         if not self.id_in_use(uid):
             sprite = item()
             self.add_item(sprite, uid)
-            print("Sprite registered: ", uid)
+            print("Sprite registered: ", uid, " >> ", item)
         pass

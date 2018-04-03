@@ -1,4 +1,5 @@
 from pygame import event
+
 import pygame
 
 class Input:
@@ -9,14 +10,10 @@ class Input:
         }
 
     def add(self, type, action):
-        print("action registered: ",type)
         if(type not in self.actions):
             self.actions[type] = [action]
         else:
             self.actions[type] += [action]
-
-    def test(self, event):
-        print("bitch")
 
     def handle(self):
         for event in pygame.event.get():
