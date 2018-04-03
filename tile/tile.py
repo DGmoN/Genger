@@ -1,5 +1,5 @@
 from facade.facade import Facade
-from manage.listener import Listner
+from manage import MouseListner
 from visible.sprite import Sprite
 import pygame
 import uuid
@@ -18,32 +18,36 @@ class FSprite(Sprite):
             rect = (0, 0, *(self.size))
         pygame.draw.rect(surface, (0,255,0) , rect, 2)
 
-class Tile(Facade, Listner):
+class Tile(Facade, MouseListner):
 
     idle_sprite = uuid.uuid1()
     hover_sprite = uuid.uuid1()
     focus_sprite = uuid.uuid1()
 
     def __init__(self):
-        Listner.__init__(self, pygame.MOUSEMOTION)
-        Listner.__init__(self, pygame.MOUSEBUTTONUP)
+        MouseListner.__init__(self)
         Facade.__init__(self)
         self.inside = False
         self.focus = False
 
     def handle(self, event):
         rect = self.get_rect()
-        self.draw()
         if(event.type is pygame.MOUSEMOTION):
             self.inside = rect.collidepoint(event.pos)
         if(event.type is pygame.MOUSEBUTTONUP):
             self.focus = self.inside and (event.button == 1)
-
+        self.draw()
 
     def create_sprite(self, registry):
-        registry.registerSprite(ISprite, Tile.hover_sprite)
-        registry.registerSprite(Sprite, Tile.idle_sprite)
-        registry.registerSprite(FSprite, Tile.focus_sprite)
+        registry.registerSprite(Sprite, Tile.hover_sprite, "hover_tile.png")
+        registry.registerSprite(Sprite, Tile.idle_sprite, "idle_tile.png")
+        registry.registerSprite(Sprite, Tile.focus_sprite, "focus_tile.png")
+
+    def onResize(self, old, new):
+        from visible import Window
+        Window.instance.get_sprite_registry().get_item(Tile.idle_sprite).setSize(new)
+        Window.instance.get_sprite_registry().get_item(Tile.hover_sprite).setSize(new)
+        Window.instance.get_sprite_registry().get_item(Tile.focus_sprite).setSize(new)
 
     def get_sprite(self):
         if(self.focus):

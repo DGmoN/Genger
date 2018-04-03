@@ -1,10 +1,19 @@
+from manage import MouseListner
 from tile import Tile
+from facade import Face
 
-class Grid(Tile):
+class Grid(Face):
 
-    tile_size = (20, 20)
+    tile_size = (50, 50)
 
     def __init__(self, w, h):
-        Tile.__init__(self)
+        Face.__init__(self)
+        self.grid = {}
         self.size = (w * Grid.tile_size[0], h * Grid.tile_size[1])
-        pass
+        for y in range(h):
+            for x in range(w):
+                tile = Tile()
+                tile.position = (x * Grid.tile_size[0], y * Grid.tile_size[1])
+                tile.setSize(Grid.tile_size)
+                self.add_item(tile)
+                self.grid[str(x) + ":" + str(y)] = tile

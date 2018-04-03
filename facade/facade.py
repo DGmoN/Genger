@@ -23,6 +23,7 @@ class Facade:
         self.visible = True
         self.size = (100, 100)
         self.image = None
+        self.create_sprite(Window.instance.get_sprite_registry())
 
     def get_rect(self):
         return Rect((*self.position, *self.size))
@@ -33,16 +34,24 @@ class Facade:
     def get_sprite(self):
         return Facade.defult_sprite
 
+    def setSize(self, size):
+        self.onResize(self.size, size)
+        self.size = size
+
+    def onResize(self, old, new):
+        pass
+
     def draw(self):
-        spr = self.get_sprite()
         from visible import Window
-        sprite = Window.get_sprite_registry().get_item(spr)
+        spr = self.get_sprite()
+        sprite = Window.instance.sprite_regestry.get_item(spr)
         if sprite and self.visible:
             self.image = Surface(self.size)
-            sprite.render(self.image)
+            sprite.render(surface = self.image)
 
     def render_sprite(self, parent: Surface):
-        parent.blit(self.image, self.position)
+        if(self.image):
+            parent.blit(self.image, self.position)
 
 
 class Face(Facade, Itterator):
@@ -52,7 +61,8 @@ class Face(Facade, Itterator):
 
     def render_sprite(self, parent: Surface):
         Facade.render_sprite(self, parent)
-        self.every(self.render_child)
+        for i in self.items:
+            i.render_sprite(parent)
 
-    def render_child(self, item, itter):
-        item.render_sprite(self.image)
+    def add_item(self, item):
+        Itterator.add_item(self, item)
