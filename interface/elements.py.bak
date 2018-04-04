@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from facade import Face
 from tile import Tile
 from facade import Facade
@@ -9,7 +8,7 @@ class Panel(Face):
 
 class Button(Tile):
 
-    def __init__(self, action, text=u"button"):
+    def __init__(self, action, text="button"):
         Tile.__init__(self)
         self.action = action
         self.text = text

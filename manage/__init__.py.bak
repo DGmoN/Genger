@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from manage.registry import Registry
 from manage.registries.sprite_registry import SpriteRegistry
 from manage.input import Input

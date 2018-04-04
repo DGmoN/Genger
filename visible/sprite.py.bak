@@ -1,14 +1,13 @@
-from __future__ import absolute_import
 import pygame
 from pygame import Surface
 import os
-class Sprite(object):
+class Sprite:
 
     def __init__(self, image):
         self.size = None
         self.picture = None
         if(image):
-            self.picture = pygame.image.load(os.path.abspath(u"img/" + image))
+            self.picture = pygame.image.load(os.path.abspath("img/" + image))
 
     def setSize(self, size):
         self.size = size

@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from visible import Window
 import pygame
 from manage import Grid
@@ -9,9 +8,9 @@ count = 0
 
 def test(event):
     global count
-    event.object.setText(unicode(count))
+    event.object.setText(str(count))
     count = count  + 1
-    print event.object.getText()
+    print(event.object.getText())
 
 
 window = Window((800, 600))
