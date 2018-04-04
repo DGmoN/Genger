@@ -29,7 +29,7 @@ class Facade:
         return Rect((*self.position, *self.size))
 
     def create_sprite(self, registry):
-        registry.add_item(Sprite, Facade.defult_sprite)
+        registry.registerSprite(Sprite, Facade.defult_sprite)
 
     def get_sprite(self):
         return Facade.defult_sprite
@@ -45,8 +45,9 @@ class Facade:
         from visible import Window
         spr = self.get_sprite()
         sprite = Window.instance.sprite_regestry.get_item(spr)
+        self.image = Surface(self.size)
+        self.image.fill(Window.transparent)
         if sprite and self.visible:
-            self.image = Surface(self.size)
             sprite.render(surface = self.image)
 
     def render_sprite(self, parent: Surface):
@@ -58,11 +59,17 @@ class Face(Facade, Itterator):
     def __init__(self):
         Facade.__init__(self)
         Itterator.__init__(self)
+        self.display = None
 
     def render_sprite(self, parent: Surface):
         Facade.render_sprite(self, parent)
-        for i in self.items:
-            i.render_sprite(parent)
+        from pygame import Surface
+        self.display = Surface(self.size)
+        self.every(self.draw_child)
+        parent.blit(self.display, self.position)
 
     def add_item(self, item):
         Itterator.add_item(self, item)
+
+    def draw_child(self, item, ittr):
+        item.render_sprite(self.display)

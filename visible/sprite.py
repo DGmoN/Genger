@@ -16,5 +16,6 @@ class Sprite:
 
     def render(self, surface):
         rect = (0, 0, *(surface.get_size()))
-        surface.blit(self.picture, (0,0))
+        if(self.picture):
+            surface.blit(self.picture, (0,0))
         pygame.draw.rect(surface, (255,255,255) , rect, 1)
