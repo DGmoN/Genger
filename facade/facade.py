@@ -24,9 +24,17 @@ class Facade:
         self.size = (100, 100)
         self.image = None
         self.create_sprite(Window.instance.get_sprite_registry())
+        self.parent = None
+
+    def getAbsolutePosition(self):
+        if not (self.parent):
+            return self.position
+        x1, y1 = self.position
+        x2, y2 = self.parent.position
+        return (x1 + x2, y1 + y2)
 
     def get_rect(self):
-        return Rect((*self.position, *self.size))
+        return Rect((*self.getAbsolutePosition(), *self.size))
 
     def create_sprite(self, registry):
         registry.registerSprite(Sprite, Facade.defult_sprite)
@@ -70,6 +78,7 @@ class Face(Facade, Itterator):
 
     def add_item(self, item):
         Itterator.add_item(self, item)
+        item.parent = self
 
     def draw_child(self, item, ittr):
         item.render_sprite(self.display)

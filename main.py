@@ -4,9 +4,14 @@ from manage import Grid
 from tile import Tile
 from interface import Panel, Button
 
+count = 0
+
 def test(event):
-    event.object.setText("--------------------")
+    global count
+    event.object.setText(str(count))
+    count = count  + 1
     print(event.object.getText())
+
 
 window = Window((800, 600))
 grid = Grid(10, 10)
