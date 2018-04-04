@@ -1,5 +1,5 @@
 from manage import MouseListner
-from tile import Tile
+from tile import Hovertile
 from facade import Face
 
 class Grid(Face):
@@ -12,7 +12,7 @@ class Grid(Face):
         self.size = (w * Grid.tile_size[0], h * Grid.tile_size[1])
         for y in range(h):
             for x in range(w):
-                tile = Tile()
+                tile = Hovertile()
                 tile.position = (x * Grid.tile_size[0], y * Grid.tile_size[1])
                 tile.setSize(Grid.tile_size)
                 self.add_item(tile)
