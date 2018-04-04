@@ -7,6 +7,10 @@ import uuid
 
 class Tile(Facade, MouseListner):
 
+    idle_sprite = uuid.uuid1()
+    hover_sprite = uuid.uuid1()
+    focus_sprite = uuid.uuid1()
+
     def __init__(self):
         MouseListner.__init__(self)
         Facade.__init__(self)
