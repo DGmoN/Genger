@@ -37,6 +37,10 @@ class Tile(Facade, MouseListner):
         if(event.type is pygame.MOUSEBUTTONUP):
             self.focus = self.inside and (event.button == 1)
         self.draw()
+<<<<<<< HEAD
+=======
+
+>>>>>>> f1925764c788a34f746471e0669cf21863a39452
 
     def create_sprite(self, registry):
         registry.registerSprite(Sprite, Tile.hover_sprite, "hover_tile.png")
