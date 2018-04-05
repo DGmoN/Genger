@@ -1,6 +1,5 @@
-from __future__ import absolute_import
 from manage import MouseListner
-from tile import Tile
+from tile import Hovertile
 from facade import Face
 
 class Grid(Face):
@@ -11,19 +10,13 @@ class Grid(Face):
         Face.__init__(self)
         self.grid = {}
         self.size = (w * Grid.tile_size[0], h * Grid.tile_size[1])
-<<<<<<< HEAD
-        for y in xrange(h):
-            for x in xrange(w):
-                tile = Hovertile()
-=======
         for y in range(h):
             for x in range(w):
-                tile = Tile()
->>>>>>> parent of 8202b51... fixed a bug
+                tile = Hovertile()
                 tile.position = (x * Grid.tile_size[0], y * Grid.tile_size[1])
                 tile.setSize(Grid.tile_size)
                 self.add_item(tile)
-                self.grid[unicode(x) + u":" + unicode(y)] = tile
+                self.grid[str(x) + ":" + str(y)] = tile
                 tile.setSize(Grid.tile_size)
                 self.add_item(tile)
         pass

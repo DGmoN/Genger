@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from visible.sprite import Sprite
 from pygame import Surface, Rect
 from manage.itterator import Itterator
@@ -14,7 +13,7 @@ def get_subsurface(parent, get):
         y = 0
     return parent.subsurface((x,y,w,h))
 
-class Facade(object):
+class Facade:
 
     defult_sprite = uuid.uuid1()
 
@@ -59,7 +58,7 @@ class Facade(object):
         if sprite and self.visible:
             sprite.render(surface = self.image)
 
-    def render_sprite(self, parent):
+    def render_sprite(self, parent: Surface):
         if(self.image):
             parent.blit(self.image, self.position)
 
@@ -70,7 +69,7 @@ class Face(Facade, Itterator):
         Itterator.__init__(self)
         self.display = None
 
-    def render_sprite(self, parent):
+    def render_sprite(self, parent: Surface):
         Facade.render_sprite(self, parent)
         from pygame import Surface
         self.display = Surface(self.size)

@@ -1,7 +1,6 @@
-from __future__ import absolute_import
 import sys
 
-class Itterator(object):
+class Itterator:
     def __init__(self):
         self.items = []
         pass

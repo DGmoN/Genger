@@ -1,11 +1,10 @@
-from __future__ import absolute_import
 import pygame
 
-class Listner(object):
+class Listner:
     def __init__(self, type):
         from visible import Window
         Window.instance.input.add(type, self.handle)
-        print("Listener: ", self)
+        #print("Listener: ", self)
 
     def handle(self, event):
         pass

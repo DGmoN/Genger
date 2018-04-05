@@ -1,9 +1,8 @@
-from __future__ import absolute_import
 from pygame import event
 
 import pygame
 
-class Input(object):
+class Input:
     def __init__(self):
         from visible import Window
         self.actions = {

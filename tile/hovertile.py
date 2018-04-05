@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from facade.facade import Facade
 from manage import MouseListner
 from visible.sprite import Sprite
@@ -16,9 +15,9 @@ class Hovertile(Tile):
         Tile.__init__(self)
 
     def create_sprite(self, registry):
-        registry.registerSprite(Sprite, Hovertile.idle_sprite, u"idle_tile.png")
-        registry.registerSprite(Sprite, Hovertile.hover_sprite, u"hover_tile.png")
-        registry.registerSprite(Sprite, Hovertile.focus_sprite, u"focus_tile.png")
+        registry.registerSprite(Sprite, Hovertile.idle_sprite, "idle_tile.png")
+        registry.registerSprite(Sprite, Hovertile.hover_sprite, "hover_tile.png")
+        registry.registerSprite(Sprite, Hovertile.focus_sprite, "focus_tile.png")
 
     def onResize(self, old, new):
         from visible import Window

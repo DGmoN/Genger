@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 from facade.facade import Facade
 from manage import MouseListner
 from visible.sprite import Sprite
@@ -6,10 +5,6 @@ import pygame
 import uuid
 
 class Tile(Facade, MouseListner):
-
-    idle_sprite = uuid.uuid1()
-    hover_sprite = uuid.uuid1()
-    focus_sprite = uuid.uuid1()
 
     def __init__(self):
         MouseListner.__init__(self)
