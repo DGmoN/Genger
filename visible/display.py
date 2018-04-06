@@ -1,26 +1,32 @@
 import pygame
 from visible import Sprite
-from manage import Itterator, Input, SpriteRegistry
-from facade import Facade
-class Window(Itterator):
+from manage import Itterator, Input, SpriteRegistry, MouseListner
+from facade import Facade, Face
+class Window(Face, Input):
 
     instance = None
-    transparent = (0,0,0)
+    transparent = (0,0,0,0)
 
     def __init__(self, dimentions):
-        Itterator.__init__(self)
+        Face.__init__(self)
+        Input.__init__(self)
+        self.addAction(pygame.QUIT, self.quit)
+        self.addActionGroup(Input.EventGroups['mouse'], self.test)
         Window.instance = self
         self.dimentions = dimentions
         self.active = False
         self.surface = None
-        self.input = Input()
         self.sprite_regestry = SpriteRegistry()
         self.font_provider = None
+
+    def test(self, event):
+        print(event)
 
     def get_sprite_registry(self):
         return Window.instance.sprite_regestry
 
-    def draw_item(self, item, ittr):
+    def init_item(self, item, ittr):
+        item.create_sprite(self.get_sprite_registry())
         item.draw()
 
     def config(self):
@@ -28,7 +34,7 @@ class Window(Itterator):
         from visible import FontProvider
         self.font_provider = FontProvider()
         self.surface = pygame.display.set_mode(self.dimentions)
-        self.every(self.draw_item)
+        self.every(self.init_item)
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -48,6 +54,6 @@ class Window(Itterator):
         self.active = True;
         while(self.active):
             self.surface.fill(Window.transparent)
-            self.input.handle()
+            self.testEvents()
             self.every(self.render_item)
             pygame.display.flip()

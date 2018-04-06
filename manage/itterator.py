@@ -9,7 +9,7 @@ class Itterator:
         for item in self.items:
             action(item, self)
 
-    def add_item(self, item):
+    def addItem(self, item):
         self.items += [item]
 
     def del_item(self, item):

@@ -1,4 +1,4 @@
-from facade.facade import Facade
+from facade.facade import Facade, Face
 from manage import MouseListner
 from visible.sprite import Sprite
 import pygame
@@ -25,3 +25,8 @@ class Tile(Facade, MouseListner):
 
     def onClick(self, event):
         pass
+
+class TileContainer(MouseListner, Face):
+    def __init__(self):
+        MouseListner.__init__(self)
+        Face.__init__(self)

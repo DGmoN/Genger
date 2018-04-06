@@ -23,7 +23,6 @@ class Facade:
         self.visible = True
         self.size = (100, 100)
         self.image = None
-        self.create_sprite(Window.instance.get_sprite_registry())
         self.parent = None
 
     def getAbsolutePosition(self):
@@ -42,6 +41,13 @@ class Facade:
     def get_sprite(self):
         return Facade.defult_sprite
 
+    def setPosition(self, pos):
+        self.onMove(self.position, pos)
+        self.position = pos
+
+    def onMove(self, old, new):
+        pass
+
     def setSize(self, size):
         self.onResize(self.size, size)
         self.size = size
@@ -53,10 +59,11 @@ class Facade:
         from visible import Window
         spr = self.get_sprite()
         sprite = Window.instance.sprite_regestry.get_item(spr)
-        self.image = Surface(self.size)
+        self.image = Surface(self.size).convert_alpha()
         self.image.fill(Window.transparent)
         if sprite and self.visible:
             sprite.render(surface = self.image)
+        print(self, " drew")
 
     def render_sprite(self, parent: Surface):
         if(self.image):
@@ -70,15 +77,24 @@ class Face(Facade, Itterator):
         self.display = None
 
     def render_sprite(self, parent: Surface):
-        Facade.render_sprite(self, parent)
         from pygame import Surface
-        self.display = Surface(self.size)
-        self.every(self.draw_child)
+        from visible import Window
+        Facade.render_sprite(self, parent)
+        self.display = Surface(self.size).convert_alpha()
+        self.display.fill(Window.transparent)
+        self.every(self.render_child)
         parent.blit(self.display, self.position)
 
     def add_item(self, item):
         Itterator.add_item(self, item)
         item.parent = self
 
-    def draw_child(self, item, ittr):
+    def draw(self):
+        Facade.draw(self)
+        self.every(self.draw_child)
+
+    def render_child(self, item, ittr):
         item.render_sprite(self.display)
+
+    def draw_child(self, item, ittr):
+        item.draw()

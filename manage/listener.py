@@ -1,18 +1,21 @@
 import pygame
+from manage import Input
 
-class Listner:
-    def __init__(self, type):
-        from visible import Window
-        Window.instance.input.add(type, self.handle)
-        #print("Listener: ", self)
+class Listner(Input):
+    def __init__(self):
+        Input.__init__(self)
 
-    def handle(self, event):
-        pass
 
 class MouseListner(Listner):
     def __init__(self):
-        Listner.__init__(self, pygame.MOUSEMOTION)
-        Listner.__init__(self, pygame.MOUSEBUTTONUP)
+        Listner.__init__(self)
+        self.addAction(pygame.MOUSEMOTION, self.onMouseMove)
+        self.addAction(pygame.MOUSEBUTTONUP, self.onMouseButtonUp)
 
-    def handle(self, event):
+    def onMouseMove(self, event):
+        print("Mouse move: ",self)
+        pass
+
+    def onMouseButtonUp(self, event):
+        print("Mouse button up: ",self)
         pass
