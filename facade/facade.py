@@ -19,7 +19,7 @@ class Facade:
 
     def __init__(self):
         from visible import Window
-        self.position = (100, 100)
+        self.position = (0, 0)
         self.visible = True
         self.size = (100, 100)
         self.image = None
@@ -32,7 +32,7 @@ class Facade:
         x2, y2 = self.parent.position
         return (x1 + x2, y1 + y2)
 
-    def get_rect(self):
+    def getRect(self):
         return Rect((*self.getAbsolutePosition(), *self.size))
 
     def create_sprite(self, registry):
@@ -46,6 +46,13 @@ class Facade:
         self.position = pos
 
     def onMove(self, old, new):
+        pass
+
+    def setParent(self, parent):
+        self.onAdded(self.parent, parent)
+        self.parent = parent
+
+    def onAdded(self, old, new):
         pass
 
     def setSize(self, size):
@@ -85,9 +92,9 @@ class Face(Facade, Itterator):
         self.every(self.render_child)
         parent.blit(self.display, self.position)
 
-    def add_item(self, item):
-        Itterator.add_item(self, item)
-        item.parent = self
+    def addItem(self, item):
+        Itterator.addItem(self, item)
+        item.setParent(self)
 
     def draw(self):
         Facade.draw(self)
