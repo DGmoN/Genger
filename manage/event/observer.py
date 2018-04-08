@@ -2,8 +2,7 @@ from pygame import event
 
 class Observer:
 
-    EVENT_MOUSE_ENTER = 18
-    EVENT_MOUSE_LEAVE = 19
+
 
     def __init__(self):
         #the hooks are the only events the observer will be observing
