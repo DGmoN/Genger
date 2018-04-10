@@ -71,12 +71,17 @@ class Facade:
         if img:
             img.draw()
 
-    def render(self, parent: Surface):
+    def getSurface(self):
         id = self.getImage()
         if(id):
             from visible import Window
             img = Window.get_image_registry().get_item(id)
-            parent.blit(img.getSurface(self.size), self.position)
+            return img
+
+    def render(self, parent: Surface):
+            img = self.getSurface()
+            if(img):
+                parent.blit(img.getSurface(self.size), self.position)
 
 
 class Face(Facade, Itterator):
