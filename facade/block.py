@@ -88,10 +88,6 @@ class Block(Face, MouseObservable, Animateable):
         new.addObserveable(self)
         pass
 
-    def onMouseMove(self, event):
-        #print("moved: ", self)
-        pass
-
     def onMouseButtonUp(self, event):
         print("Button: ", event.button)
         pass
