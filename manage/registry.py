@@ -9,8 +9,13 @@ class Registry:
         self.items[uid] = item
         return id
 
+    def contains(self, item):
+        return item in self.items.values()
+
     def id_in_use(self, uid : uuid):
         return (uid in self.items)
 
     def get_item(self, uid):
-        return self.items[uid]
+        if uid in self.items:
+            return self.items[uid]
+        return None

@@ -15,7 +15,7 @@ def get_subsurface(parent, get):
 
 class Facade:
 
-    defult_sprite = uuid.uuid1()
+    defult_image = None
 
     def __init__(self):
         from visible import Window
@@ -35,11 +35,14 @@ class Facade:
     def getRect(self):
         return Rect((*self.getAbsolutePosition(), *self.size))
 
-    def create_sprite(self, registry):
-        registry.registerSprite(Sprite, Facade.defult_sprite)
+    def createImage(self):
+        from visible import Window, Image
+        img = Image((200,200))
+        img.addSprite(Sprite)
+        self.image = Window.get_image_registry().registerImage(img, self.image)
 
-    def get_sprite(self):
-        return Facade.defult_sprite
+    def getImage(self):
+        return self.image
 
     def setPosition(self, pos):
         self.onMove(self.position, pos)
@@ -64,17 +67,16 @@ class Facade:
 
     def draw(self):
         from visible import Window
-        spr = self.get_sprite()
-        sprite = Window.instance.sprite_regestry.get_item(spr)
-        self.image = Surface(self.size).convert_alpha()
-        self.image.fill(Window.transparent)
-        if sprite and self.visible:
-            sprite.render(surface = self.image)
-        print(self, " drew")
+        img = Window.get_image_registry().get_item(self.image)
+        if img:
+            img.draw()
 
-    def render_sprite(self, parent: Surface):
-        if(self.image):
-            parent.blit(self.image, self.position)
+    def render(self, parent: Surface):
+        id = self.getImage()
+        if(id):
+            from visible import Window
+            img = Window.get_image_registry().get_item(id)
+            parent.blit(img.getSurface(self.size), self.position)
 
 
 class Face(Facade, Itterator):
@@ -83,14 +85,14 @@ class Face(Facade, Itterator):
         Itterator.__init__(self)
         self.display = None
 
-    def render_sprite(self, parent: Surface):
-        from pygame import Surface
-        from visible import Window
-        Facade.render_sprite(self, parent)
-        self.display = Surface(self.size).convert_alpha()
-        self.display.fill(Window.transparent)
-        self.every(self.render_child)
-        parent.blit(self.display, self.position)
+    def render(self, parent: Surface):
+        if(self.image):
+            from visible import Window
+            img = Window.get_image_registry().get_item(self.getImage())
+            img = img.getSurface(self.size)
+            self.display = img.copy()
+            self.every(self.render_child)
+            parent.blit(self.display, self.position)
 
     def addItem(self, item):
         Itterator.addItem(self, item)
@@ -100,8 +102,13 @@ class Face(Facade, Itterator):
         Facade.draw(self)
         self.every(self.draw_child)
 
+    def createImage(self):
+        Facade.createImage(self)
+        for item in self.items:
+            item.createImage()
+
     def render_child(self, item, ittr):
-        item.render_sprite(self.display)
+        item.render(self.display)
 
     def draw_child(self, item, ittr):
         item.draw()

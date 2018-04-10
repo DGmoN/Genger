@@ -1,6 +1,6 @@
 import pygame, sys
 from visible import Sprite
-from manage import Itterator, Input, SpriteRegistry, MouseListner, OWindow
+from manage import Itterator, Input, SpriteRegistry, MouseListner, OWindow, Resources
 from facade import Facade, Face
 
 class Window(Face, OWindow):
@@ -8,30 +8,32 @@ class Window(Face, OWindow):
     instance = None
     transparent = (0,0,0,0)
     last_frame = 0
+    frameCount = 0
 
     def __init__(self, dimentions):
         Face.__init__(self)
         OWindow.__init__(self)
         Window.instance = self
+        self.resources = None
         self.dimentions = dimentions
         self.active = False
         self.surface = None
-        self.sprite_regestry = SpriteRegistry()
-        self.font_provider = None
         self.clock = None
 
-    def get_sprite_registry(self):
-        return Window.instance.sprite_regestry
+    def get_sprite_registry():
+        return Window.instance.resources.sprite_registry
+
+    def get_image_registry():
+        return Window.instance.resources.image_regestry
 
     def init_item(self, item, ittr):
-        item.create_sprite(self.get_sprite_registry())
+        item.createImage()
         item.draw()
 
     def config(self):
         pygame.init();
         self.clock = pygame.time.Clock()
-        from visible import FontProvider
-        self.font_provider = FontProvider()
+        self.resources = Resources()
         self.surface = pygame.display.set_mode(self.dimentions)
         self.every(self.init_item)
 
@@ -39,9 +41,10 @@ class Window(Face, OWindow):
         return self
 
     def render_item(self, item, ittr):
-        item.render_sprite(self.surface)
+        item.render(self.surface)
 
     def onWindowCloseRequest(self, event):
+        self.active = False
         sys.exit()
 
     def run(self):
@@ -51,5 +54,5 @@ class Window(Face, OWindow):
             self.surface.fill(Window.transparent)
             self.observe(pygame.event.get())
             self.every(self.render_item)
-            Window.last_frame = self.clock.tick(32)
+            Window.last_frame = self.clock.tick(30)
             pygame.display.flip()
