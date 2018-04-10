@@ -72,10 +72,14 @@ class Block(Face, MouseObservable, Animateable):
         Window.get_image_registry().registerImage(hov, Block.hover_image)
         pass
 
+    def getSurface(self):
+        surf = Face.getSurface(self)
+        self.ColourChange.applyRender(surf)
+        return surf
+
     def render(self, parent):
-        Face.render(self, parent)
         Animateable.render(self)
-        parent.fill(self.ColourChange.currentCollor, (*self.position, *self.size), pygame.BLEND_ADD)
+        Face.render(self, parent)
 
     def onMove(self, old, new):
         Face.onMove(self, old, new)
