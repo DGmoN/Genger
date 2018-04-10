@@ -9,6 +9,7 @@ from manage import Observer
 
 class Observeable(Itterator):
 
+    EVENT_RELEASED = pygame.USEREVENT
     EVENT_MOUSE_ENTER = pygame.USEREVENT + 1
     EVENT_MOUSE_LEAVE = pygame.USEREVENT + 2
 
@@ -18,17 +19,47 @@ class Observeable(Itterator):
         self.observer = None    #The parent of the observable
         self.actions = {}       #The actions connected to the observeable
         self.validations = {}   #The rules set by each action to test against before excecution
+        self.grabbed = {}
         self.observables = []
+        self.ungrabbed = []
         pass
 
+    def observeGrabbed(self, events):
+        ret = []
+        for eve in events:
+            if(eve.type in self.grabbed):
+                for g in self.grabbed[eve.type]:
+                    g.observe(events)
+            else:
+                ret += [eve]
+        return ret
+
     def observe(self, events):
-        for e in self.observables:
-            e.observe(events)
-        for i in events:
+        que = self.observeGrabbed(events)
+        for e in self.ungrabbed:
+            e.observe(que)
+        for i in que:
             if(i.type in self.actions):
                 if(self.testEvent(i)):
                     for e in self.actions[i.type]:
-                        e(events)
+                        e(i)
+
+    def grab(self, type, obs):
+        if(type in self.grabbed):
+            self.grabbed[type] += [obs]
+        else:
+            self.grabbed[type] = [obs]
+        if(obs in self.ungrabbed):
+            self.ungrabbed.remove(obs)
+
+    def release(self, type, obs):
+        if(type in self.grabbed):
+            if(obs in self.grabbed[type]):
+                self.grabbed[type].remove(obs)
+            if not(self.grabbed[type]):
+                self.grabbed.pop(type, None)
+
+        self.ungrabbed += [obs]
 
     def testEvent(self, event):
         if(event.type in self.validations):
@@ -37,8 +68,13 @@ class Observeable(Itterator):
                     return False
         return True
 
+    def releaseOnEvent(self, event):
+        self.observer.release(event.type, self)
+
     def addObserveable(self, obs):
         self.observables += [obs]
+        self.ungrabbed += [obs]
+        obs.observer = self
         print(self.observables)
 
     def addAction(self, type, action):
@@ -64,7 +100,8 @@ class MouseObservable(Observeable):
         Observeable.__init__(self)
         self.addAction(pygame.MOUSEMOTION, [self.onMouseMove])
         self.addAction(Observeable.EVENT_MOUSE_ENTER, [self.onMouseEnter])
-        self.addAction(Observeable.EVENT_MOUSE_LEAVE, [self.onMouseLeave])
+        self.addAction(Observeable.EVENT_MOUSE_LEAVE, [self.onMouseLeave, self.releaseOnEvent])
+        self.addAction(Observeable.EVENT_RELEASED, [self.onReleased])
         self.addValidator(pygame.MOUSEMOTION, [self.isMouseInside])
         self.addValidator(Observeable.EVENT_MOUSE_ENTER, [self.isMouseInside])
         self.mouseInside = False
@@ -75,11 +112,16 @@ class MouseObservable(Observeable):
         wasInside = self.mouseInside
         self.mouseInside = self.getRect().collidepoint(eve.pos)
         if( not wasInside and self.mouseInside):
-            event.post(event.Event(Observeable.EVENT_MOUSE_ENTER, eve.__dict__))
+            self.observer.grab(pygame.MOUSEMOTION, self)
+            self.onMouseEnter(eve)
         elif(wasInside and not self.mouseInside):
-            event.post(event.Event(Observeable.EVENT_MOUSE_LEAVE, eve.__dict__))
-
+            self.observer.release(pygame.MOUSEMOTION, self)
+            self.onMouseLeave(eve)
         return self.mouseInside
+        pass
+
+    def onReleased(self, event):
+        #print("Release: ", event.type, self)
         pass
 
     def getAbsolutePosition(self):
