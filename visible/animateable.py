@@ -126,10 +126,10 @@ class ColourChange(Animation):
 
     def onStep(self):
         c1, c2, dd = self.getKeyframes()
-        r1, g1, b1 = c1
-        r2, g2, b2 = c2
-        rd, gd, bd = (r2 - r1), (g2 - g1), (b2 - b1)
-        self.currentCollor = ((int(rd * dd) + r1), (int(gd * dd) + g1), (int(bd * dd) + b1))
+        r1, g1, b1, a1 = c1
+        r2, g2, b2, a2 = c2
+        rd, gd, bd, ad = (r2 - r1), (g2 - g1), (b2 - b1), (a2 - a1)
+        self.currentCollor = ((int(rd * dd) + r1), (int(gd * dd) + g1), (int(bd * dd) + b1), (int(ad * dd) + a1))
         pass
 
     def applyRender(self, surf):

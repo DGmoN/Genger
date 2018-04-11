@@ -16,12 +16,15 @@ class Observeable(Itterator):
     EVENT_SENDER = None
 
     def __init__(self):
+        if(hasattr(self, "created")):
+            return
         self.observer = None    #The parent of the observable
         self.actions = {}       #The actions connected to the observeable
         self.validations = {}   #The rules set by each action to test against before excecution
         self.grabbed = {}
         self.observables = []
         self.ungrabbed = []
+        self.created = True
         pass
 
     def observeGrabbed(self, events):
@@ -142,6 +145,18 @@ class MouseObservable(Observeable):
         pass
 
     def onMouseMove(self, event):
+        pass
+
+class KeyboardObserveable(Observer):
+    def __init__(self):
+        Observeable.__init__(self)
+        self.addAction(pygame.KEYUP, [self.onKeyUp])
+        self.addAction(pygame.KEYDOWN, [self.onKeyDown])
+
+    def onKeyUp(self, event):
+        pass
+
+    def onKeyDown(self, event):
         pass
 
 class OWindow(Observeable):

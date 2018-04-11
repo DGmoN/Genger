@@ -1,26 +1,25 @@
 from facade import Block
 from visible import ColourChange, ImageChange
 from visible import RadialGlow, ImageSequence
+from manage import KeyboardObserveable
 import random
 import uuid
-class BeatTile(Block):
+class BeatTile(Block, KeyboardObserveable):
 
     Fade = uuid.uuid1()
 
     def __init__(self):
+        KeyboardObserveable.__init__(self)
         Block.__init__(self)
-        self.color = ColourChange(2000)
-        self.color.addKeyFrame(0, (0,0,0))
-        self.color.addKeyFrame(0.5, (255,100,100))
-        self.color.addKeyFrame(1, (0,0,0))
+        self.key = 0
         self.backdrop = ImageChange(1000)
-        self.backdrop.loop = True
-        self.color.loop = True
-        for i in range(60):
-            self.backdrop.addKeyFrame(i/59, i)
-
+        for i in range(24):
+            self.backdrop.addKeyFrame(i/23, i)
         self.addAnimation(self.backdrop)
-        self.addAnimation(self.color)
+
+    def onKeyDown(self, event):
+        if(event.key == self.key):
+            self.backdrop.play()
 
     def createImage(self):
         Block.createImage(self)
@@ -43,8 +42,7 @@ class BeatTile(Block):
 
         if(event.button == 1):
             #self.color.addKeyFrame(0.5, (random.randint(0,255),random.randint(0,255),random.randint(0,255)))
-            if not(self.color.running):
-                self.color.play()
-            self.backdrop.play()
+            if not(self.backdrop.running):
+                self.backdrop.play()
         if(event.button == 2):
-            self.color.stop(True)
+            self.backdrop.stop(True)

@@ -1,6 +1,6 @@
 import pygame, sys
 from visible import Sprite
-from manage import Itterator, Input, SpriteRegistry, MouseListner, OWindow, Resources
+from manage import Itterator, Input, SpriteRegistry, OWindow, Resources
 from facade import Facade, Face
 
 class Window(Face, OWindow):
