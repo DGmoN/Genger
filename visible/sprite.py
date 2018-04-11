@@ -22,7 +22,7 @@ class Sprite:
         if(self.picture):
             surface.blit(self.picture, (0,0))
 
-        pygame.draw.rect(surface, (1,1,1, 100) , rect)
+        pygame.draw.rect(surface, (1,1,1, 255) , rect)
         pygame.draw.rect(surface, (255,255,255, 255) , rect, 1)
         print("Sprite: ", self)
 

@@ -1,3 +1,4 @@
+import pygame
 
 class Animateable:
     def __init__(self):
@@ -20,29 +21,91 @@ class Animateable:
 class Animation:
     def __init__(self, duration):
         self.duration = duration
+        self.keyframes = {}
         self.time = 0
         self.animate = None
         self.direction = 0
         self.loop = False
+        self.repeat = False
+        self.running = False
+
+    def addKeyFrame(self, time, data):
+        self.keyframes[time] = data
+
+    def getKeyframes(self):
+        current_pos = self.getCompletion()
+        keys = list(self.keyframes.keys())
+        upList = [ i for i in keys if i >= current_pos]
+        lowList = [ i for i in keys if i <= current_pos]
+        try:
+            upper = min(upList, key=lambda x:abs(x-current_pos))
+        except Exception as e:
+            print(current_pos)
+            quit()
+        if(lowList):
+            lower = min(lowList, key=lambda x:abs(x-current_pos))
+        else:
+            lower = 0
+        base = upper - lower
+        if(base == 0):
+            return (self.keyframes[lower], self.keyframes[upper], 1)
+        return (self.keyframes[lower], self.keyframes[upper], (current_pos - lower) / base)
+
+    def play(self):
+        if(self.direction == 0):
+            self.direction = 1
+        self.running = True
+
+    def stop(self, compleate=False):
+        self.running = False
 
     def onComplete(self):
-        self.time = 0
         pass
 
     def getCompletion(self):
         return (self.time / self.duration)
 
     def step(self):
+        if(not self.running):
+            return
         from visible import Window
         self.time += (Window.last_frame * self.direction)
-        if(self.time > self.duration or self.time <= 0):
-            self.direction = 0
+        if(self.time > self.duration): self.time = self.duration
+        elif(self.time < 0): self.time = 0
+        if(self.time >= self.duration or self.time <= 0):
+            if not (self.repeat or self.loop):
+                self.direction = 0
+                self.running = False
+            if(self.repeat):
+                self.time = 0
+            if(self.loop):
+                self.direction *= -1
+
             self.onComplete()
 
-        self.onStep()
+        if not(self.direction == 0):
+            self.onStep()
+
 
     def onStep(self):
         pass
 
     def applyRender(self, surf):
         pass
+
+class ColourChange(Animation):
+    def __init__(self, duration):
+        Animation.__init__(self, duration)
+        self.currentCollor = (0,0,0)
+
+    def onStep(self):
+        c1, c2, dd = self.getKeyframes()
+        r1, g1, b1 = c1
+        r2, g2, b2 = c2
+        rd, gd, bd = (r2 - r1), (g2 - g1), (b2 - b1)
+        self.currentCollor = ((int(rd * dd) + r1), (int(gd * dd) + g1), (int(bd * dd) + b1))
+        pass
+
+    def applyRender(self, surf):
+        if(self.currentCollor):
+            surf.fill(self.currentCollor, special_flags=pygame.BLEND_ADD)

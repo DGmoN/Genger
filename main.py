@@ -1,21 +1,18 @@
 from visible import Window
-from facade import Facade, Face, Block
+from facade import Panel
+from app import BeatTile
 
+size = (100, 100)
 
 window = Window((800, 600))
-blk = Block()
-blk.setSize((300,300))
-qqq = Block()
-qqq.setPosition((20,20))
-blk.addItem(qqq)
-blk2 = Block()
-blk2.setPosition((300,50))
-blk2.setSize((300,300))
-"""blk3 = Block()
-blk3.setPosition((350,50))
-blk.addItem(blk2)
-#window.addItem(blk3)"""
-window.addItem(blk)
-window.addItem(blk2)
-window.list_events()
+beatPanel = Panel()
+beatPanel.setSize((600,600))
+for y in range(6):
+    for x in range(6):
+        tile = BeatTile()
+        tile.setSize(size)
+        w, h = size
+        tile.setPosition(((w*x),(h*y)))
+        beatPanel.addItem(tile)
+window.addItem(beatPanel)
 window.run()
