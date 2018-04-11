@@ -1,5 +1,5 @@
 import pygame
-
+from visible import ImageSequence
 class Animateable:
     def __init__(self):
         self.animations = []
@@ -75,6 +75,7 @@ class Animation:
         if(self.time >= self.duration or self.time <= 0):
             if not (self.repeat or self.loop):
                 self.direction = 0
+                self.time = 0
                 self.running = False
             if(self.repeat):
                 self.time = 0
@@ -93,6 +94,31 @@ class Animation:
     def applyRender(self, surf):
         pass
 
+class ImageChange(Animation):
+    def __init__(self, duraion):
+        Animation.__init__(self, duraion)
+        self.squares = 0
+        self.currentImage = None
+        self.image = None
+
+    def setImage(self, image: ImageSequence):
+        self.image = image
+        frames = len(self.keyframes)
+        import math
+        image.squares = int(math.ceil(math.sqrt(frames)))
+        image.frames = frames
+
+    def onStep(self):
+        c1, c2, dd = self.getKeyframes()
+        self.currentImage = self.image.getSubsurface(c1)
+
+    def onComplete(self):
+        self.currentImage = None
+
+    def applyRender(self, surf):
+        if(self.currentImage):
+            surf.blit(self.currentImage, (0,0))
+
 class ColourChange(Animation):
     def __init__(self, duration):
         Animation.__init__(self, duration)
@@ -108,4 +134,9 @@ class ColourChange(Animation):
 
     def applyRender(self, surf):
         if(self.currentCollor):
-            surf.fill(self.currentCollor, special_flags=pygame.BLEND_ADD)
+            surf.fill(self.currentCollor, special_flags=pygame.BLEND_RGB_SUB)
+
+    def onComplete(self):
+        a, b, c = self.getKeyframes()
+        self.currentCollor = b
+        pass

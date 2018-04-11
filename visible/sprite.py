@@ -9,6 +9,7 @@ class Sprite:
         self.color = (255,100,100, 25)
         self.frame = 0
         self.frame_limit = 10
+        self.mutation = None
         if(image):
             self.picture = pygame.image.load(os.path.abspath("img/" + image))
 
@@ -27,18 +28,19 @@ class Sprite:
         print("Sprite: ", self)
 
 
-class AnimationSprite(Sprite):
-    def __init__(self, image, frames):
-        Sprite.__init__(self, image)
-        self.frames = frames
-        self.frame = 0
-
-    def draw_frame(self, frame, surface):
-        pass
-
-    def calculateScroll(self, frame, size):
-        pass
+class RadialGlow(Sprite):
+    def __init__(self, image):
+        Sprite.__init__(self, None)
 
     def render(self, surface):
-        self.draw_frame(self.frame, surface)
-        self.frame += 1
+        import math, pygame.gfxdraw
+        a, b = surface.get_size()
+        mx, my = a/2, b/2
+        max = math.sqrt((mx*mx)+(my*my))
+        for y in range(b):
+            for x in range(a):
+                w = x - mx
+                h = y - my
+                crt = math.sqrt((w*w) + (h*h))
+                ax = min([(((crt * (self.mutation)) / max) + (25 / max)) * 255, 255])
+                pygame.gfxdraw.pixel(surface, x, y, (255,255,255,ax))

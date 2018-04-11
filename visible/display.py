@@ -54,5 +54,5 @@ class Window(Face, OWindow):
             self.surface.fill(Window.transparent)
             self.observe(pygame.event.get())
             self.every(self.render_item)
-            Window.last_frame = self.clock.tick(30)
+            Window.last_frame = self.clock.tick()
             pygame.display.flip()
