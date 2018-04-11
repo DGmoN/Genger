@@ -3,6 +3,7 @@ from manage import MouseObservable
 from visible import Sprite, Animateable, Image, Animation
 import uuid
 import pygame
+import random
 
 class AA(Sprite):
     def render(self, surface):
@@ -33,11 +34,19 @@ class blip(Animation):
         self.animate.position= (nx, ny)
 
 class ColourChange(Animation):
-    def __init__(self, duration):
+    def __init__(self, duration, startcolor=(0,0,0), endcolor=(0,0,0)):
         Animation.__init__(self, duration)
-        self.startColor = (255,255,0)
-        self.endColor = (0,0,255)
+        self.startColor = startcolor
+        self.endColor = endcolor
         self.currentCollor = self.startColor
+
+
+    def onComplete(self):
+        if self.time >= self.duration:
+            self.direction = -1
+            self.time = self.duration
+        else:
+            self.time = 0
 
     def onStep(self):
         r1, g1, b1 = self.startColor
@@ -48,58 +57,40 @@ class ColourChange(Animation):
         pass
 
     def applyRender(self, surf):
-        surf.fill(self.currentCollor, special_flags=pygame.BLEND_ADD)
+        if(self.currentCollor):
+            surf.fill(self.currentCollor, special_flags=pygame.BLEND_ADD)
 
 class Block(Face, MouseObservable, Animateable):
-
-    hover_image = uuid.uuid1()
 
     def __init__(self):
         MouseObservable.__init__(self)
         Face.__init__(self)
         Animateable.__init__(self)
-        self.motion = blip(1000)
-        self.ColourChange = ColourChange(1000)
-        self.motion.setEnd((100,100))
-        self.addAnimation(self.motion)
+        self.ColourChange = ColourChange(200, endcolor=(random.randint(0, 255),random.randint(0, 255),random.randint(0, 255)))
+        self.ColourChange.loop = True
         self.addAnimation(self.ColourChange)
-
-    def createImage(self):
-        from visible import Window
-        Face.createImage(self)
-        hov = Image((200,200))
-        hov.addSprite(AA)
-        Window.get_image_registry().registerImage(hov, Block.hover_image)
-        pass
 
     def getSurface(self):
         surf = Face.getSurface(self)
-        self.ColourChange.applyRender(surf)
+        Animateable.render(self, surf)
         return surf
 
     def render(self, parent):
-        Animateable.render(self)
         Face.render(self, parent)
 
     def onMove(self, old, new):
         Face.onMove(self, old, new)
-        self.motion.setStart(new)
 
     def draw(self):
         Face.draw(self)
-        from visible import Window
-        Window.get_image_registry().get_item(Block.hover_image).draw()
 
     def onMouseEnter(self, event):
         print("entered ", self)
-        self.motion.direction = 1
         self.ColourChange.direction = 1
         pass
 
     def onMouseLeave(self, event):
         print("left ", self)
-        self.motion.direction = -1
-        self.ColourChange.direction = -1
         pass
 
     def onAdded(self, old, new):

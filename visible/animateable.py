@@ -13,8 +13,9 @@ class Animateable:
     def draw(self):
         pass
 
-    def render(self):
+    def render(self, surf):
         for e in self.animations: e.step()
+        for e in self.animations: e.applyRender(surf)
 
 class Animation:
     def __init__(self, duration):
@@ -24,6 +25,10 @@ class Animation:
         self.direction = 0
         self.loop = False
 
+    def onComplete(self):
+        self.time = 0
+        pass
+
     def getCompletion(self):
         return (self.time / self.duration)
 
@@ -31,16 +36,13 @@ class Animation:
         from visible import Window
         self.time += (Window.last_frame * self.direction)
         if(self.time > self.duration or self.time <= 0):
-            if(self.loop):
-                self.time -= self.duration
-            else:
-                if(self.direction > 0):
-                    self.time = self.duration
-                elif self.direction < 0:
-                    self.time = 0
-                self.direction = 0
+            self.direction = 0
+            self.onComplete()
 
         self.onStep()
 
     def onStep(self):
+        pass
+
+    def applyRender(self, surf):
         pass
