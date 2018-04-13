@@ -12,14 +12,22 @@ class BeatTile(Block, KeyboardObserveable):
         KeyboardObserveable.__init__(self)
         Block.__init__(self)
         self.key = 0
-        self.backdrop = ImageChange(1000)
+        self.backdrop = ImageChange(200)
         for i in range(24):
             self.backdrop.addKeyFrame(i/23, i)
+        self.backdrop.circular = True
         self.addAnimation(self.backdrop)
 
     def onKeyDown(self, event):
         if(event.key == self.key):
-            self.backdrop.play()
+            self.backdrop.play(1)
+
+
+    def onMouseEnter(self, event):
+        self.backdrop.play(1)
+
+    def onMouseLeave(self, event):
+        self.backdrop.play(-1)
 
     def createImage(self):
         Block.createImage(self)
@@ -39,10 +47,6 @@ class BeatTile(Block, KeyboardObserveable):
         Block.draw(self)
 
     def onMouseButtonUp(self, event):
-
         if(event.button == 1):
-            #self.color.addKeyFrame(0.5, (random.randint(0,255),random.randint(0,255),random.randint(0,255)))
-            if not(self.backdrop.running):
-                self.backdrop.play()
-        if(event.button == 2):
-            self.backdrop.stop(True)
+            from main import MainGamePanel
+            MainGamePanel.tileConfig.inspectTile(self)

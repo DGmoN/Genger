@@ -2,7 +2,6 @@ import pygame
 from pygame import event
 from manage import Itterator
 import sys
-from manage import Observer
 """
     An Observeable object defines paramaters to flag in the event set
 """
@@ -10,10 +9,7 @@ from manage import Observer
 class Observeable(Itterator):
 
     EVENT_RELEASED = pygame.USEREVENT
-    EVENT_MOUSE_ENTER = pygame.USEREVENT + 1
-    EVENT_MOUSE_LEAVE = pygame.USEREVENT + 2
-
-    EVENT_SENDER = None
+    EVENT_TEST = pygame.USEREVENT + 1
 
     def __init__(self):
         if(hasattr(self, "created")):
@@ -21,48 +17,81 @@ class Observeable(Itterator):
         self.observer = None    #The parent of the observable
         self.actions = {}       #The actions connected to the observeable
         self.validations = {}   #The rules set by each action to test against before excecution
-        self.grabbed = {}
+        self.grabbed = []
         self.observables = []
         self.ungrabbed = []
         self.created = True
+        self.addAction(Observeable.EVENT_TEST, [self.onTestRecieved])
         pass
+
+    def onTestRecieved(self, event):
+        print(event.depth * "-", self)
+        event.depth+=1
+
+    def getActionKeys(self):
+        return list(self.actions.keys())
 
     def observeGrabbed(self, events):
         ret = []
+        state = self.grabbed.copy()
+        for type in state:
+            for g in state[type]:
+                g.observe(events)
         for eve in events:
-            if(eve.type in self.grabbed):
-                for g in self.grabbed[eve.type]:
-                    g.observe(events)
-            else:
+            if not (eve.type in self.grabbed):
                 ret += [eve]
+
         return ret
 
     def observe(self, events):
-        que = self.observeGrabbed(events)
+        if not (events):
+            return []
+        exclusion_ids = []
+        clean = events.copy()
+        for e in self.grabbed:
+            holder = e.observe(events) # returns the observers exclusion id list
+            for i in holder:
+                if(i not in exclusion_ids):
+                    exclusion_ids += [i]
+                if(i in clean):
+                    clean.remove(i)
         for e in self.ungrabbed:
-            e.observe(que)
-        for i in que:
+            e.observe(clean)
+        for i in clean:
             if(i.type in self.actions):
+                exclusion_ids += [i]
                 if(self.testEvent(i)):
                     for e in self.actions[i.type]:
                         e(i)
+        return exclusion_ids
 
-    def grab(self, type, obs):
-        if(type in self.grabbed):
-            self.grabbed[type] += [obs]
-        else:
-            self.grabbed[type] = [obs]
+    def grabEvent(self):
+        if(self.observer):
+            self.observer.grab(self)
+            print("Grabbed", self)
+
+    def isGrabbed(self, type, obj):
+
+        return type in self.grabbed.keys() and obj in self.grabbed[type]
+
+    def releaseEvent(self):
+        if(self.observer):
+            self.observer.release(self, self)
+            print("Released", self)
+
+    def grab(self, obs):
+        if(obs in self.grabbed):
+            return
         if(obs in self.ungrabbed):
             self.ungrabbed.remove(obs)
+            self.grabbed += [obs]
 
     def release(self, type, obs):
-        if(type in self.grabbed):
-            if(obs in self.grabbed[type]):
-                self.grabbed[type].remove(obs)
-            if not(self.grabbed[type]):
-                self.grabbed.pop(type, None)
-
-        self.ungrabbed += [obs]
+        if(obs in self.ungrabbed):
+            return
+        if(obs in self.grabbed):
+            self.grabbed.remove(obs)
+            self.ungrabbed += [obs]
 
     def testEvent(self, event):
         if(event.type in self.validations):
@@ -92,9 +121,21 @@ class Observeable(Itterator):
         else:
             self.validations[type] = action
 
-    def list_events(self):
-        for ev, actions in self.actions.items():
-            print(event.event_name(ev), actions)
+    def tree(self):
+        depth = 0
+        if(self.parent):
+            depth = self.parent.tree()
+        print(">>"*depth, self)
+        print("+"*depth, "Grabbed:")
+        for e in self.grabbed:
+            print(("-"*depth)+ ">",e)
+        print("+"*depth, "Observables:")
+        for e in self.observables:
+            print(("-"*depth)+ ">",e)
+        print("+"*depth, "Events:")
+        for e in self.actions:
+            print(("-"*depth)+ ">",event.event_name( e))
+        return depth + 1
 
 
 class MouseObservable(Observeable):
@@ -114,12 +155,8 @@ class MouseObservable(Observeable):
         wasInside = self.mouseInside
         self.mouseInside = self.getRect().collidepoint(eve.pos)
         if( not wasInside and self.mouseInside):
-            self.observer.grab(pygame.MOUSEMOTION, self)
-            self.observer.grab(pygame.MOUSEBUTTONUP, self)
             self.onMouseEnter(eve)
         elif(wasInside and not self.mouseInside):
-            self.observer.release(pygame.MOUSEMOTION, self)
-            self.observer.release(pygame.MOUSEBUTTONUP, self)
             self.onMouseLeave(eve)
         return self.mouseInside
         pass
@@ -147,7 +184,7 @@ class MouseObservable(Observeable):
     def onMouseMove(self, event):
         pass
 
-class KeyboardObserveable(Observer):
+class KeyboardObserveable(Observeable):
     def __init__(self):
         Observeable.__init__(self)
         self.addAction(pygame.KEYUP, [self.onKeyUp])

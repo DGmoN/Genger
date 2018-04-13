@@ -9,5 +9,5 @@ class FontProvider:
             "default" : Font("C:/Windows/Fonts/ariblk.ttf", 16)
         }
 
-    def render(self,text, font="default", color=(255,255,255)):
+    def render(self,text, font="default", color=(255,255,255,255)):
         return FontProvider.Fonts[font].render(text, True, color)

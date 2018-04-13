@@ -1,11 +1,5 @@
-from facade import Face
-from manage import Observeable
+from facade import Block
 
-class Panel(Face, Observeable):
+class Panel(Block):
     def __init__(self):
-        Face.__init__(self)
-        Observeable.__init__(self)
-
-    def onAdded(self, old, new):
-        new.addObserveable(self)
-        pass
+        Block.__init__(self)

@@ -47,6 +47,8 @@ class Window(Face, OWindow):
         self.active = False
         sys.exit()
 
+
+
     def run(self):
         self.config()
         self.active = True;

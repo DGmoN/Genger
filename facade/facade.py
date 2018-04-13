@@ -80,6 +80,7 @@ class Facade:
                 return img.getSurface(self.size)
 
     def render(self, parent: Surface):
+        if(self.visible):
             img = self.getSurface()
             if(img):
                 parent.blit(img, self.position)
@@ -92,11 +93,12 @@ class Face(Facade, Itterator):
         self.display = None
 
     def render(self, parent: Surface):
-        img = self.getSurface()
-        if(img):
-            self.display = img.copy()
-            self.every(self.render_child)
-            parent.blit(self.display, self.position)
+        if(self.visible):
+            img = self.getSurface()
+            if(img):
+                self.display = img.copy()
+                self.every(self.render_child)
+                parent.blit(self.display, self.position)
 
     def addItem(self, item):
         Itterator.addItem(self, item)

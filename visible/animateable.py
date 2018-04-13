@@ -27,6 +27,7 @@ class Animation:
         self.direction = 0
         self.loop = False
         self.repeat = False
+        self.circular = False
         self.running = False
 
     def addKeyFrame(self, time, data):
@@ -37,11 +38,10 @@ class Animation:
         keys = list(self.keyframes.keys())
         upList = [ i for i in keys if i >= current_pos]
         lowList = [ i for i in keys if i <= current_pos]
-        try:
+        if(upList):
             upper = min(upList, key=lambda x:abs(x-current_pos))
-        except Exception as e:
-            print(current_pos)
-            quit()
+        else:
+            upper = 0
         if(lowList):
             lower = min(lowList, key=lambda x:abs(x-current_pos))
         else:
@@ -49,14 +49,19 @@ class Animation:
         base = upper - lower
         if(base == 0):
             return (self.keyframes[lower], self.keyframes[upper], 1)
+        if(lower == 0):
+            return (self.keyframes[upper], self.keyframes[upper], (current_pos - lower) / base)
+        if(upper == 0):
+            return (self.keyframes[lower], self.keyframes[lower], 1)
         return (self.keyframes[lower], self.keyframes[upper], (current_pos - lower) / base)
 
-    def play(self):
-        if(self.direction == 0):
-            self.direction = 1
+    def play(self, direction):
+        self.direction = direction
         self.running = True
 
     def stop(self, compleate=False):
+        if(not self.repeat):
+            self.time = 0
         self.running = False
 
     def onComplete(self):
@@ -74,13 +79,16 @@ class Animation:
         elif(self.time < 0): self.time = 0
         if(self.time >= self.duration or self.time <= 0):
             if not (self.repeat or self.loop):
-                self.direction = 0
-                self.time = 0
-                self.running = False
+                if(self.circular):
+                    self.direction = -1
+                else:
+                    self.direction = 0
+                    self.running = False
             if(self.repeat):
                 self.time = 0
             if(self.loop):
                 self.direction *= -1
+
 
             self.onComplete()
 
@@ -110,10 +118,12 @@ class ImageChange(Animation):
 
     def onStep(self):
         c1, c2, dd = self.getKeyframes()
+
         self.currentImage = self.image.getSubsurface(c1)
 
     def onComplete(self):
-        self.currentImage = None
+        c1, c2, dd = self.getKeyframes()
+        self.currentImage = self.image.getSubsurface(c2)
 
     def applyRender(self, surf):
         if(self.currentImage):
@@ -140,3 +150,83 @@ class ColourChange(Animation):
         a, b, c = self.getKeyframes()
         self.currentCollor = b
         pass
+
+class Motion(Animation):
+    def __init__(self, duration):
+        Animation.__init__(self, duration)
+        self.location = (0,0)
+
+    def onStep(self):
+        c1, c2, dd = self.getKeyframes()
+        x1, y1 = c1
+        x2, y2 = c2
+        dx, dy = (x2 - x1), (y2 - y1)
+        self.location = (((dd*dx) + x1, (dd * dy)+y1))
+        self.animate.setPosition(self.location)
+        print(self.getKeyframes())
+
+    def onComplete(self):
+        a, b, c = self.getKeyframes()
+        self.location = b
+
+class Resise(Animation):
+    def __init__(self, duration):
+        Animation.__init__(self, duration)
+        self.size = (0,0)
+
+    def onStep(self):
+        c1, c2, dd = self.getKeyframes()
+        x1, y1 = c1
+        x2, y2 = c2
+        dx, dy = (x2 - x1), (y2 - y1)
+        self.size = (int((dd*dx) + x1), int((dd * dy)+y1))
+        self.animate.setSize(self.size)
+
+    def onComplete(self):
+        c1, c2, dd = self.getKeyframes()
+        dd = self.getCompletion()
+        if dd > 0.5:
+            self.animate.setSize(c2)
+        else:
+            self.animate.setSize(c1)
+        pass
+
+class Sequencer(Animation):
+    def __init__(self):
+        Animation.__init__(self, 0)
+        self.Buffer = {}
+        self.recording = False
+
+    def record(self):
+        self.recording = True
+
+    def stopRecording(self):
+        self.recording = False
+        for time, data in self.Buffer.items():
+            frame = time/self.time
+            self.addKeyFrame(frame, data)
+        self.Buffer = {}
+        self.duration = self.time
+        print("Sequence saved:")
+        print("Duration:",self.duration)
+        print("Frames:", len(self.keyframes))
+        self.time = 0
+
+    def onStep(self):
+        c1, c2, dd = self.getKeyframes()
+        from pygame import event
+        if(dd > 0.5):
+            event.post(c2)
+        else:
+            event.post(c1)
+        pass
+
+    def place(self, data):
+        self.Buffer[self.time] = data
+
+    def step(self):
+        if not self.recording:
+            Animation.step(self)
+        else:
+            from visible import Window
+            self.time += (Window.last_frame)

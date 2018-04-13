@@ -32,7 +32,6 @@ class Block(Face, MouseObservable, Animateable):
 
     def onMouseLeave(self, event):
         print("left ", self)
-        #self.ColourChange.direction = -1
         pass
 
     def onAdded(self, old, new):
@@ -40,5 +39,5 @@ class Block(Face, MouseObservable, Animateable):
         pass
 
     def onMouseButtonUp(self, event):
-        print("Button: ", event.button)
+        print("Button: ", self)
         pass
