@@ -10,6 +10,7 @@ class Observeable(Itterator):
 
     EVENT_RELEASED = pygame.USEREVENT
     EVENT_TEST = pygame.USEREVENT + 1
+    GRAB = None#pygame.MOUSEBUTTONUP
 
     def __init__(self):
         if(hasattr(self, "created")):
@@ -31,18 +32,6 @@ class Observeable(Itterator):
     def getActionKeys(self):
         return list(self.actions.keys())
 
-    def observeGrabbed(self, events):
-        ret = []
-        state = self.grabbed.copy()
-        for type in state:
-            for g in state[type]:
-                g.observe(events)
-        for eve in events:
-            if not (eve.type in self.grabbed):
-                ret += [eve]
-
-        return ret
-
     def observe(self, events):
         if not (events):
             return []
@@ -58,11 +47,13 @@ class Observeable(Itterator):
         for e in self.ungrabbed:
             e.observe(clean)
         for i in clean:
-            if(i.type in self.actions):
-                exclusion_ids += [i]
-                if(self.testEvent(i)):
-                    for e in self.actions[i.type]:
-                        e(i)
+            if(i not in exclusion_ids):
+                if(i.type in self.actions):
+                    if(self.testEvent(i)):
+                        for e in self.actions[i.type]:
+                            e(i)
+                        if i.type == Observeable.GRAB:
+                            print("Event debug: ",self)
         return exclusion_ids
 
     def grabEvent(self):
@@ -145,15 +136,17 @@ class MouseObservable(Observeable):
         self.addAction(pygame.MOUSEMOTION, [self.onMouseMove])
         self.addAction(Observeable.EVENT_RELEASED, [self.onReleased])
         self.addAction(pygame.MOUSEBUTTONUP, [self.onMouseButtonUp])
+        self.addAction(pygame.MOUSEBUTTONDOWN, [self.onMouseButtonDown])
         self.addValidator(pygame.MOUSEMOTION, [self.isMouseInside])
         self.addValidator(pygame.MOUSEBUTTONUP, [self.isMouseInside])
+        self.addValidator(pygame.MOUSEBUTTONDOWN, [self.isMouseInside])
         self.mouseInside = False
         self.position = (0,0)
         self.size = (0,0)
 
     def isMouseInside(self, eve):
         wasInside = self.mouseInside
-        self.mouseInside = self.getRect().collidepoint(eve.pos)
+        self.mouseInside = self.getBoudingRect().collidepoint(eve.pos)
         if( not wasInside and self.mouseInside):
             self.onMouseEnter(eve)
         elif(wasInside and not self.mouseInside):
@@ -168,11 +161,14 @@ class MouseObservable(Observeable):
     def getAbsolutePosition(self):
         return self.position
 
-    def getRect(self):
+    def getBoudingRect(self):
         from pygame import Rect
         return Rect((*self.getAbsolutePosition(), *self.size))
 
     def onMouseButtonUp(self, event):
+        pass
+
+    def onMouseButtonDown(self, event):
         pass
 
     def onMouseEnter(self, event):

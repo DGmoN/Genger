@@ -24,7 +24,7 @@ class Sprite:
             surface.blit(self.picture, (0,0))
 
         pygame.draw.rect(surface, (1,1,1, 255) , rect)
-        pygame.draw.rect(surface, (255,255,255, 255) , rect, 1)
+        pygame.draw.rect(surface, (255,255,200, 255) , rect, 1)
         print("Sprite: ", self)
 
 
@@ -43,4 +43,4 @@ class RadialGlow(Sprite):
                 h = y - my
                 crt = math.sqrt((w*w) + (h*h))
                 ax = min([(((crt * (self.mutation)) / max) + (25 / max)) * 255, 255])
-                pygame.gfxdraw.pixel(surface, x, y, (0,155,155,ax))
+                pygame.gfxdraw.pixel(surface, x, y, (100,155,155,ax))

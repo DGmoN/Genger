@@ -1,1 +1,1 @@
-from display import Window
+from display import * as Display

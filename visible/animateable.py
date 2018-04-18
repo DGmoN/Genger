@@ -8,15 +8,21 @@ class Animateable:
         self.animations += [animation]
         animation.animate = self
 
-    def onStep(self):
+    def onStep(self, animation):
+        pass
+
+    def onComplete(self, animation):
         pass
 
     def draw(self):
         pass
 
-    def render(self, surf):
+    def paintAnimation(self, surface):
+        for e in self.animations:
+            e.paint(surface)
+
+    def run(self):
         for e in self.animations: e.step()
-        for e in self.animations: e.applyRender(surf)
 
 class Animation:
     def __init__(self, duration):
@@ -36,6 +42,8 @@ class Animation:
     def getKeyframes(self):
         current_pos = self.getCompletion()
         keys = list(self.keyframes.keys())
+        if(len(keys) == 2):
+            return (self.keyframes[keys[0]], self.keyframes[keys[1]], current_pos)
         upList = [ i for i in keys if i >= current_pos]
         lowList = [ i for i in keys if i <= current_pos]
         if(upList):
@@ -73,40 +81,47 @@ class Animation:
     def step(self):
         if(not self.running):
             return
+        self.onStep()
+        self.animate.onStep(self)
+
         from visible import Window
         self.time += (Window.last_frame * self.direction)
         if(self.time > self.duration): self.time = self.duration
         elif(self.time < 0): self.time = 0
         if(self.time >= self.duration or self.time <= 0):
-            if not (self.repeat or self.loop):
-                if(self.circular):
+            if(self.circular):
+                if(self.direction > 0):
                     self.direction = -1
                 else:
                     self.direction = 0
                     self.running = False
-            if(self.repeat):
+            elif(self.repeat):
                 self.time = 0
-            if(self.loop):
+            elif(self.loop):
                 self.direction *= -1
-
-
+            else:
+                self.running = False
+            self.animate.onComplete(self)
             self.onComplete()
 
-        if not(self.direction == 0):
-            self.onStep()
+        if(self.direction == 0):
+            self.running = False
 
 
     def onStep(self):
         pass
 
-    def applyRender(self, surf):
+    def getImage(self):
+        pass
+
+    def paint(self, surface):
         pass
 
 class ImageChange(Animation):
     def __init__(self, duraion):
         Animation.__init__(self, duraion)
         self.squares = 0
-        self.currentImage = None
+        self.currentImage = pygame.Surface((0,0))
         self.image = None
 
     def setImage(self, image: ImageSequence):
@@ -118,16 +133,17 @@ class ImageChange(Animation):
 
     def onStep(self):
         c1, c2, dd = self.getKeyframes()
-
         self.currentImage = self.image.getSubsurface(c1)
 
     def onComplete(self):
         c1, c2, dd = self.getKeyframes()
         self.currentImage = self.image.getSubsurface(c2)
 
-    def applyRender(self, surf):
-        if(self.currentImage):
-            surf.blit(self.currentImage, (0,0))
+    def getImage(self):
+        return self.currentImage
+
+    def paint(self, surface):
+        surface.blit(self.getImage(), (0,0))
 
 class ColourChange(Animation):
     def __init__(self, duration):
@@ -136,15 +152,16 @@ class ColourChange(Animation):
 
     def onStep(self):
         c1, c2, dd = self.getKeyframes()
-        r1, g1, b1, a1 = c1
-        r2, g2, b2, a2 = c2
-        rd, gd, bd, ad = (r2 - r1), (g2 - g1), (b2 - b1), (a2 - a1)
-        self.currentCollor = ((int(rd * dd) + r1), (int(gd * dd) + g1), (int(bd * dd) + b1), (int(ad * dd) + a1))
+        r1, g1, b1 = c1
+        r2, g2, b2 = c2
+        rd, gd, bd = (r2 - r1), (g2 - g1), (b2 - b1)
+        self.currentCollor = ((int(rd * dd) + r1), (int(gd * dd) + g1), (int(bd * dd) + b1))
+
         pass
 
-    def applyRender(self, surf):
+    def paint(self, surf):
         if(self.currentCollor):
-            surf.fill(self.currentCollor, special_flags=pygame.BLEND_RGB_SUB)
+            surf.fill(self.currentCollor, special_flags=pygame.BLEND_MULT)
 
     def onComplete(self):
         a, b, c = self.getKeyframes()
