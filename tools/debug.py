@@ -1,4 +1,4 @@
 class Debug:
-    SHOW_PADDING = True
-    SHOW_BOUNDING_RECT = True
+    SHOW_PADDING = False
+    SHOW_BOUNDING_RECT = False
     LOG_REPAINT = False

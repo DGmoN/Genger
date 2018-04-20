@@ -16,30 +16,30 @@ class Facade(Frame):
     def repaint(self, dest):
         if(self.parent):
             surface = self.parent.repaint(dest)
-            if(Debug.LOG_REPAINT): print("!", surface, self)
+            if(Debug.LOG_REPAINT): print("!", surface, self.getBoudingRect(), self)
             if(dest is self):
                 try:
                     #print(surface, self)
                     surface = surface.subsurface(self.getBoudingRect())
                     surface.fill((0,0,0,0))
                     dest.render(surface)
+                    return
                 except ValueError as e:
                     print(">", surface, self.getBoudingRect(), self)
                     raise e
                 except AttributeError as a:
                     print(">", self.parent, surface, self.getBoudingRect(), self)
                     raise a
-            return surface
-        else:
-            return surface.subsurface(self.getInternalRect())
+        return surface.subsurface(self.getBoudingRect())
 
     def onAdded(self, parent):
         pass
 
     def render(self, surface):
+        from pygame import draw
         if(Debug.SHOW_BOUNDING_RECT):
-            from pygame import draw
             draw.rect(surface, (255,255,255, 255), surface.get_rect(), 2)
+        draw.rect(surface, (100,100,100, 255), surface.get_rect(), 1)
 
 
     def paintInternal(self, surface):
@@ -91,7 +91,11 @@ class Face(Facade, Itterator):
 
     def render(self, surface):
         from display import Window
-        mys = surface.subsurface(self.getBoudingRect())
+        try:
+            mys = surface#.subsurface(self.getBoudingRect())
+        except ValueError as e:
+            print(surface, self.getBoudingRect())
+            raise e
         Facade.render(self, mys)
         self.childLayer = mys
         self.every(self.render_child)

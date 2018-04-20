@@ -6,6 +6,7 @@ class Image:
         self.sprites = []
         self.surface = Surface(size).convert_alpha()
         self.drawn = False
+        self.uuid = None
 
     def addSprite(self, spriteClass):
         if(spriteClass in self.sprites):
@@ -55,4 +56,4 @@ class ImageSequence(Image):
                 sprite = Window.get_sprite_registry().getItem(e)
                 sprite.mutation = i/self.frames
                 sprite.render(self.getSubsurface(i))
-        pygame.image.save(self.surface, "things.png")
+        pygame.image.save(self.surface, "TransparencyImageTest.png")

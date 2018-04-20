@@ -160,7 +160,7 @@ class ColourChange(Animation):
 
     def paint(self, surf):
         if(self.currentCollor):
-            surf.fill(self.currentCollor, special_flags=pygame.BLEND_ADD)
+            surf.fill(self.currentCollor, surf.get_rect().inflate(-1,-1) ,special_flags=pygame.BLEND_MULT)
 
     def onComplete(self):
         a, b, c = self.getKeyframes()

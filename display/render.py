@@ -20,6 +20,12 @@ class Window(OWindow, Face):
         self.active = False
         self.surface = None
         self.clock = None
+        from ui import BeatPannel, TileConfigPanel
+        self.BeatPannel = BeatPannel()
+        self.ConfigPanel = TileConfigPanel()
+
+        self.addItem(self.BeatPannel)
+        self.addItem(self.ConfigPanel)
 
     def get_sprite_registry():
         return Window.instance.resources.sprite_registry
