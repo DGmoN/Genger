@@ -1,11 +1,16 @@
 from display import Window
 from display import Face
-from ui.UIElement import UIElement
+from ui import UIElement, Label, Button, Panel, TextInput, BeatTile
 window = Window((800,600))
 
-ff = UIElement()
-ff.position = (0,0)
-ff.size = (100,100)
-window.addItem(ff)
+pan = Panel()
+pan.setSize((200,200))
+
+
+ff = BeatTile()
+ff.setPosition((0,0))
+ff.setSize((100,100))
+pan.addItem(ff)
+window.addItem(pan)
 ff.treePos()
 window.run()

@@ -84,7 +84,7 @@ class Animation:
         self.onStep()
         self.animate.onStep(self)
 
-        from visible import Window
+        from display import Window
         self.time += (Window.last_frame * self.direction)
         if(self.time > self.duration): self.time = self.duration
         elif(self.time < 0): self.time = 0
@@ -101,12 +101,11 @@ class Animation:
                 self.direction *= -1
             else:
                 self.running = False
-            self.animate.onComplete(self)
             self.onComplete()
+            self.animate.onComplete(self)
 
         if(self.direction == 0):
             self.running = False
-
 
     def onStep(self):
         pass
@@ -161,12 +160,14 @@ class ColourChange(Animation):
 
     def paint(self, surf):
         if(self.currentCollor):
-            surf.fill(self.currentCollor, special_flags=pygame.BLEND_MULT)
+            surf.fill(self.currentCollor, special_flags=pygame.BLEND_ADD)
 
     def onComplete(self):
         a, b, c = self.getKeyframes()
-        self.currentCollor = b
-        pass
+        if(c > 0.5):
+            self.currentCollor = b
+        else:
+            self.currentCollor = a
 
 class Motion(Animation):
     def __init__(self, duration):

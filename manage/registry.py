@@ -15,7 +15,7 @@ class Registry:
     def id_in_use(self, uid : uuid):
         return (uid in self.items)
 
-    def get_item(self, uid):
+    def getItem(self, uid):
         if uid in self.items:
             return self.items[uid]
         return None

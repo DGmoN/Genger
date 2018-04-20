@@ -14,25 +14,26 @@ class Frame:
         self.size = (0,0)
         self.parent = None
 
-    # The bounding rect describes the surface to be drawn to
-    def getBoudingRect(self):
+    def getAbsoluteRect(self):
         from pygame import Rect
         if(self.parent):
-            containBOunds = self.parent.getBoudingRect()
+            containBOunds = self.parent.getAbsoluteRect()
             x, y, w, h = containBOunds
             X, Y = self.position
             return Rect((x + X, y + Y, *self.size))
-        return Rect((*self.position, *self.size))
+        return self.getBoudingRect()
 
-    # returns a rect within the object, intended to be used as padding
-    def getInternalRect(self):
-        x, y, w, h = self.getBoudingRect()
-        l, t, r, b = self.padding
+
+    # The bounding rect describes the surface to be drawn to
+    def getBoudingRect(self):
         from pygame import Rect
-        return Rect((x + l, y + t, w - r - l, h - t - b))
+        return Rect((*self.position, *self.size))
 
     def getPosition(self):
         return self.position
+
+    def setPosition(self, pos):
+        self.position = pos
 
     def getSize(self):
         return self.size
@@ -60,5 +61,5 @@ class Frame:
         count = 0
         if(self.parent):
             count = self.parent.treePos() + 1
-        print("-"*count, self.getBoudingRect(), self.getInternalRect())
+        print("-"*count, self.getAbsoluteRect(), self)
         return count

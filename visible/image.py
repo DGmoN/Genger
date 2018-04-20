@@ -10,17 +10,17 @@ class Image:
     def addSprite(self, spriteClass):
         if(spriteClass in self.sprites):
             return
-        from visible import Window
+        from display import Window
         import uuid
         id = uuid.uuid1()
         Window.get_sprite_registry().registerSprite(spriteClass, id)
         self.sprites += [id]
 
     def draw(self):
-        from visible import Window
+        from dispaly import Window
         self.surface.fill(Window.transparent)
         for e in self.sprites:
-            sprite = Window.get_sprite_registry().get_item(e)
+            sprite = Window.get_sprite_registry().getItem(e)
             sprite.render(self.surface)
         print("drew: ", self)
 
@@ -46,14 +46,13 @@ class ImageSequence(Image):
     def draw(self):
         from pygame import Surface
         import pygame
-        from visible import Window
+        from display import Window
         w, h = self.size
         self.surface = Surface((w*self.squares, h*self.squares)).convert_alpha()
         self.surface.fill(Window.transparent)
         for i in range(self.frames):
             for e in self.sprites:
-                sprite = Window.get_sprite_registry().get_item(e)
+                sprite = Window.get_sprite_registry().getItem(e)
                 sprite.mutation = i/self.frames
                 sprite.render(self.getSubsurface(i))
-        pygame.image.save(self.surface, "hell.png")
-        print("drew: ", self)
+        pygame.image.save(self.surface, "things.png")

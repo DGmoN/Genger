@@ -146,7 +146,7 @@ class MouseObservable(Observeable):
 
     def isMouseInside(self, eve):
         wasInside = self.mouseInside
-        self.mouseInside = self.getBoudingRect().collidepoint(eve.pos)
+        self.mouseInside = self.getAbsoluteRect().collidepoint(eve.pos)
         if( not wasInside and self.mouseInside):
             self.onMouseEnter(eve)
         elif(wasInside and not self.mouseInside):
@@ -161,7 +161,7 @@ class MouseObservable(Observeable):
     def getAbsolutePosition(self):
         return self.position
 
-    def getBoudingRect(self):
+    def getAbsoluteRect(self):
         from pygame import Rect
         return Rect((*self.getAbsolutePosition(), *self.size))
 

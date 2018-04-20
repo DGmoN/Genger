@@ -29,7 +29,7 @@ class Sprite:
 
 
 class RadialGlow(Sprite):
-    def __init__(self, image):
+    def __init__(self, size):
         Sprite.__init__(self, None)
 
     def render(self, surface):
@@ -43,4 +43,4 @@ class RadialGlow(Sprite):
                 h = y - my
                 crt = math.sqrt((w*w) + (h*h))
                 ax = min([(((crt * (self.mutation)) / max) + (25 / max)) * 255, 255])
-                pygame.gfxdraw.pixel(surface, x, y, (100,155,155,ax))
+                pygame.gfxdraw.pixel(surface, x, y, (255,255,255,ax))
