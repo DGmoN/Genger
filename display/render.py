@@ -71,5 +71,5 @@ class Window(OWindow, Face):
             self.update()
             pygame.display.set_caption(str(self.clock.get_fps()))
             self.observe(pygame.event.get())
-            Window.last_frame = self.clock.tick(30)
+            Window.last_frame = self.clock.tick()
             pygame.display.flip()

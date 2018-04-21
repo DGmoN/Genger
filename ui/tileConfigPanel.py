@@ -1,6 +1,7 @@
 from ui import Panel
 from ui import Buttons
 from ui import LinkPanel
+from ui import TextInput
 
 class TileConfigPanel(Panel):
     def __init__(self):
@@ -19,7 +20,16 @@ class TileConfigPanel(Panel):
         self.colour.setSize((190, 30))
         self.addItem(self.colour)
         self.addItem(self.grabber)
+        self.soundType = TextInput(self.setSound)
+        self.soundType.setSize((190, 30))
+        self.soundType.setPosition((5, 270))
+        self.addItem(self.soundType)
         self.tile = None
+
+    def setSound(self, text):
+        if(self.tile):
+            self.tile.configSound(text)
+        pass
 
     def inspectTile(self, tile):
         from pygame import Color
@@ -29,6 +39,8 @@ class TileConfigPanel(Panel):
         self.colour.level = h/100
         self.colour.repaint(self.colour)
         self.linker.setTile(tile)
+        if(tile.soundDir): self.soundType.setText(tile.soundDir)
+        else: self.soundType.setText("")
 
     def setColor(self, hue):
         ang = 360 * hue

@@ -95,14 +95,16 @@ class Animation:
                 else:
                     self.direction = 0
                     self.running = False
+                    self.onComplete()
+                    self.animate.onComplete(self)
             elif(self.repeat):
                 self.time = 0
             elif(self.loop):
                 self.direction *= -1
             else:
                 self.running = False
-            self.onComplete()
-            self.animate.onComplete(self)
+                self.onComplete()
+                self.animate.onComplete(self)
 
         if(self.direction == 0):
             self.running = False

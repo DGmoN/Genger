@@ -1,6 +1,7 @@
 from ui import UIElement
 from visible import ImageChange, ImageSequence, RadialGlow, ColourChange
 from uuid import uuid1
+from pygame.mixer import Sound
 class BeatTile(UIElement):
     tileSize = (100, 100)
     back = uuid1()
@@ -20,7 +21,9 @@ class BeatTile(UIElement):
         self.background.circular = True
         self.ColourChange.circular = True
         self.setSize(BeatTile.tileSize)
+        self.soundDir = None
         self.sound = None
+        self.playing = False
         self.key = 0
         self.gridPos = (0,0)
         self.links = {"top":None, "right": None, "bottom": None, "left": None}
@@ -41,18 +44,38 @@ class BeatTile(UIElement):
         self.ColourChange.addKeyFrame(1, color)
         self.beat()
 
+    def configSound(self, dir):
+        self.soundDir = dir
+        import os
+        cwd = os.getcwd() + "/sounds/"+dir+".wav"
+        if(os.path.isfile(cwd)):
+            self.sound = Sound(cwd)
+            self.background.duration = self.sound.get_length() * 1000
+            self.ColourChange.duration = self.sound.get_length() * 1000
+        else:
+            print("File does not exist: ",cwd)
+            self.sound = None
+
+    def triggerLinks(self):
+        for i, e in self.links.items():
+            if(e): e.beat()
+
     def onComplete(self, animation):
         if(animation == self.background):
-            for i, a in self.links.items():
-                if(a):
-                    a.beat()
+            self.triggerLinks()
+        pass
 
     def beat(self):
+        if(self.sound):
+            self.playing = True
+            self.grabEvent()
+            self.sound.play()
         self.background.play(1)
         self.ColourChange.play(1)
 
     def onMouseEnter(self, event):
-        self.beat()
+        self.background.time = 100
+        self.ColourChange.play(1)
 
     def onKeyUp(self, event):
         if(event.key == self.key):
