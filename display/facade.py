@@ -2,59 +2,22 @@ from display import Frame
 from manage import Itterator
 from tools.debug import Debug
 from uuid import uuid1
-class Facade(Frame):
+from display.Context import Context
+class Facade(Frame, Context):
 
     Empty = uuid1()
 
     def __init__(self):
         Frame.__init__(self)
+        Context.__init__(self)
+        #self.addContextListner("pos", self.onMove)
         self.padding = (10,10,10,10)
+
+    def onMove(self, old, new):
+        pass
 
     def init(self):
         pass
-
-    def repaint(self, dest):
-        if(self.parent):
-            surface = self.parent.repaint(dest)
-            if(Debug.LOG_REPAINT): print("!", surface, self.getBoudingRect(), self)
-            if(dest is self):
-                try:
-                    #print(surface, self)
-                    surface = surface.subsurface(self.getBoudingRect())
-                    surface.fill((0,0,0,0))
-                    dest.render(surface)
-                    return
-                except ValueError as e:
-                    print(">", surface, self.getBoudingRect(), self)
-                    raise e
-                except AttributeError as a:
-                    print(">", self.parent, surface, self.getBoudingRect(), self)
-                    raise a
-        return surface.subsurface(self.getBoudingRect())
-
-    def onAdded(self, parent):
-        pass
-
-    def render(self, surface):
-        from pygame import draw
-        if(Debug.SHOW_BOUNDING_RECT):
-            draw.rect(surface, (255,255,255, 255), surface.get_rect(), 2)
-        draw.rect(surface, (100,100,100, 255), surface.get_rect(), 1)
-
-
-    def paintInternal(self, surface):
-        from display import Window
-        if(Debug.SHOW_PADDING):
-            surface.fill((0,100,0,100))
-        else:
-            surface.fill(Window.transparent)
-
-    def paintExternal(self, bounds):
-        from display import Window
-        if(Debug.SHOW_PADDING):
-            bounds.fill((100,0,0,100))
-        else:
-            bounds.fill(Window.transparent)
 
     def update(self):
         pass

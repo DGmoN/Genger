@@ -10,7 +10,7 @@ A Frame has 4 base values
 
 class Frame:
     def __init__(self):
-        self.position = (0,0)
+        self.pos = (0,0)
         self.size = (0,0)
         self.parent = None
 
@@ -20,20 +20,23 @@ class Frame:
             containBOunds = self.parent.getAbsoluteRect()
             x, y, w, h = containBOunds
             X, Y = self.position
-            return Rect((x + X, y + Y, *self.size))
+            a, b = self.size
+            return Rect((x + X, y + Y, a, b))
         return self.getBoudingRect()
 
 
     # The bounding rect describes the surface to be drawn to
     def getBoudingRect(self):
         from pygame import Rect
-        return Rect((*self.position, *self.size))
+        x, y = self.getPosition()
+        w, h = self.getSize()
+        return Rect((x, y, w, h))
 
     def getPosition(self):
-        return self.position
+        return self.pos
 
     def setPosition(self, pos):
-        self.position = pos
+        self.pos = pos
 
     def getSize(self):
         return self.size
@@ -42,11 +45,11 @@ class Frame:
         self.size = size
 
     def getX(self):
-        x, y = self.position
+        x, y = self.pos
         return x
 
     def getY(self):
-        x, y = self.position
+        x, y = self.pos
         return y
 
     def getWidth(self):
