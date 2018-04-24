@@ -1,25 +1,37 @@
 from display import Frame
 from manage import Itterator
 from tools.debug import Debug
-from uuid import uuid1
 from display.Context import Context
-class Facade(Frame, Context):
+from pygame import Rect
+from display.Placement import Image
 
-    Empty = uuid1()
+class Facade(Frame, Context):
 
     def __init__(self):
         Frame.__init__(self)
         Context.__init__(self)
-        #self.addContextListner("pos", self.onMove)
+        self.absolutePos = (0,0)
+        self.addContextListner("pos", self.updateAbsolutePos)
         self.padding = (10,10,10,10)
 
-    def onMove(self, old, new):
+    def updateAbsolutePos(self, old, new):
+        if(self.parent):
+            x, y = self.parent.absolutePos
+            ix, iy = new
+            self.absolutePos = (x + ix, y + iy)
+            return
+        self.absolutePos = self.pos
         pass
 
-    def init(self):
+    def getAbsoluteRect(self):
+        x, y = self.absolutePos
+        w, h = self.size
+        return Rect((x,y,w,h))
+
+    def onAdded(self, parent):
         pass
 
-    def update(self):
+    def linkImages(self, parentImage):
         pass
 
 class Face(Facade, Itterator):
@@ -27,7 +39,14 @@ class Face(Facade, Itterator):
         Facade.__init__(self)
         Itterator.__init__(self)
         self.renderItems = []
-        self.childLayer = None
+        self.childLayer = Image(None, context=self)
+
+    def updateAbsolutePos(self, old, new):
+        Facade.updateAbsolutePos(self,old,new)
+        self.every(self.updateChildAbsolutePos)
+
+    def updateChildAbsolutePos(self, item, ittr):
+        item.updateAbsolutePos(item.pos, item.pos)
 
     def addItem(self, item):
         Itterator.addItem(self, item)
@@ -35,30 +54,10 @@ class Face(Facade, Itterator):
         self.renderItems += [item]
         item.onAdded(self)
 
-    def render_child(self, item, ittr):
-        csurf = self.childLayer.subsurface(item.getBoudingRect())
-        item.render(csurf)
+    def linkChildImages(self, item, ittr):
+        item.linkImages(self.childLayer)
 
-    def update_child(self, item, ittr):
-        item.update()
-
-    def init_child(self, item, ittr):
-        item.init()
-
-    def init(self):
-        Facade.init(self)
-        self.every(self.init_child)
-
-    def update(self):
-        self.every(self.update_child)
-
-    def render(self, surface):
-        from display import Window
-        try:
-            mys = surface#.subsurface(self.getBoudingRect())
-        except ValueError as e:
-            print(surface, self.getBoudingRect())
-            raise e
-        Facade.render(self, mys)
-        self.childLayer = mys
-        self.every(self.render_child)
+    def linkImages(self, parentImage):
+        parentImage.linkImage("containerChildren", self.childLayer)
+        self.every(self.linkChildImages)
+        pass

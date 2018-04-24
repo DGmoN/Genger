@@ -1,20 +1,21 @@
 from display import Face
+from display.Placement import Image
+from display.Effect import PlainColor
 from manage import MouseObservable, KeyboardObserveable
 from visible import Animateable, ColourChange
 import pygame
 class UIElement(Face, MouseObservable, KeyboardObserveable, Animateable):
     def __init__(self):
         MouseObservable.__init__(self)
+        Face.__init__(self)
         KeyboardObserveable.__init__(self)
         Animateable.__init__(self)
-        Face.__init__(self)
+        self.img = Image(None, context=self)
+        self.img.addPainter("Background",PlainColor((100,0,0,100)))
 
-        self.padding = (10,10,10,10)
-
-    def render(self, surface):
-        Face.render(self, surface)
-        self.paintAnimation(surface)
-        pass
+    def linkImages(self, parentImage):
+        Face.linkImages(self, parentImage)
+        parentImage.linkImage("baseUIImage", self.img)
 
     def onStep(self, animation):
         self.repaint(self)
@@ -30,6 +31,10 @@ class UIElement(Face, MouseObservable, KeyboardObserveable, Animateable):
     def onAdded(self, parent):
         parent.addObserveable(self)
 
+    def onMouseMove(self, event):
+        pass
+
+
     def onMouseLeave(self, event):
-        #self.repaint(self)
+
         pass

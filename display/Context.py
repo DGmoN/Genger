@@ -10,13 +10,14 @@ class Context:
             else:
                 self.contextListners[name] = [function]
 
-    def handleContextChange(self, name, new):
-        if(name in self.contextListners):
-            self.hasChanged = True
-            print("Context changed: ", name, new)
-            for f in self.contextListners[name]:
-                if(f):
-                    f(self.__dict__[name], new)
+    def handleContextChange(self, name, old, new):
+        if("contextListners" in self.__dict__):
+            if(name in self.contextListners):
+                self.hasChanged = True
+                print("Context changed: ", name, new)
+                for f in self.contextListners[name]:
+                    if(f):
+                        f(old, new)
 
     def clearChange(self):
         self.hasChanged = False
@@ -27,9 +28,13 @@ class Context:
 
     def __setattr__(self, name, value):
         try:
+
             if(name in self.__dict__):
-                self.handleContextChange(name, value)
-            self.__dict__[name] = value
+                old = self.__dict__[name]
+                self.__dict__[name] = value
+                self.handleContextChange(name, old, value)
+            else:
+                self.__dict__[name] = value
         except AttributeError as e:
             print("Context has no attr: ",name)
             raise e

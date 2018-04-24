@@ -10,9 +10,9 @@ A Frame has 4 base values
 
 class Frame:
     def __init__(self):
-        self.pos = (0,0)
-        self.size = (0,0)
-        self.parent = None
+        self.__dict__['pos'] = (0,0)
+        self.__dict__['size'] = (0,0)
+        self.__dict__['parent'] = None
 
     def getAbsoluteRect(self):
         from pygame import Rect
