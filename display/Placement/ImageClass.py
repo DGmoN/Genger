@@ -62,6 +62,11 @@ class Image:
 
     def addPainter(self, id, painter:Painter):
         self.painters[id] = painter
+        painter.boundImage = self
+
+    def getPainter(self, id):
+        if(id in self.painters):
+            return self.painters[id]
 
     def onSizeChange(self, old, new):
         pass
@@ -99,7 +104,6 @@ class Image:
         print("-"*depth,"painting: ",self)
         for i, e in self.painters.items():
             print("-"*(depth+1),"painter: ",i)
-            e.contextData = self.contextData
             e.apply(self.surface)
 
     def onPosChange(self, old, new):

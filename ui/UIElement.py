@@ -34,7 +34,9 @@ class UIElement(Face, MouseObservable, KeyboardObserveable, Animateable):
     def onMouseMove(self, event):
         pass
 
+    def onMouseEnter(self, event):
+        self.img.getPainter("Background").getContext().color = (100,255,255)
 
     def onMouseLeave(self, event):
-
+        self.img.getPainter("Background").getContext().color = (100,0,0,100)
         pass

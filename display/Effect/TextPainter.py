@@ -6,19 +6,21 @@ class TextPainter(Painter):
     def __init__(self):
         Painter.__init__(self)
         self.font = None
+        self.contextData.init_context_vars({
+            "font_color" : (255,255,255,255),
+            "font"       : "arial.ttf",
+            "font_size"  : 8,
+            "text_pos"   : (0,0),
+            "text"       : ""
+        })
+        self.contextData.addContextListner("text", self.textUpdate)
+
+    def textUpdate(self, old, new):
+        self.boundImage.repaint()
 
     def apply(self, surface:Surface):
-        if "text" in self.contextData.__dict__:
-            if not self.font:
-                font = "arial.ttf"
-                if "font" in self.contextData.__dict__: font = self.contextData.font
-                font_size = 8
-                if "font_size" in self.contextData.__dict__: font_size = self.contextData.font_size
-                self.font = Font(FileProvider.getFontFile(font), font_size)
-            color = (255,255,255)
-            if "font_color" in self.contextData.__dict__: color = self.contextData.font_color
-            sub = self.font.render(self.contextData.text, True, color)
-            textpos = (0,0)
-            if "text_pos" in self.contextData.__dict__: textpos = self.contextData.text_pos
-            surface.blit(sub, textpos)
+        if not self.font:
+            self.font = Font(FileProvider.getFontFile(self.contextData.font), self.contextData.font_size)
+        sub = self.font.render(self.contextData.text, True, self.contextData.font_color)
+        surface.blit(sub, self.contextData.text_pos)
         pass

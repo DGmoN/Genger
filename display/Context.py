@@ -19,6 +19,11 @@ class Context:
                     if(f):
                         f(old, new)
 
+    def init_context_vars(self, vars:dict):
+        for i, e in vars.items():
+            if i not in self.__dict__:
+                self.__dict__[i] = e
+
     def clearChange(self):
         self.hasChanged = False
 

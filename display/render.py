@@ -54,8 +54,8 @@ class Window(OWindow, Face):
         r = (x/800) * 255
         g = ((x+y)/(800+600)) * 255
         b = (y/600) * 255
-        self.img.getRootImage().getLinkedImage("debugOverlay").contextData.font_color = ((r,g,b))
-        self.img.getRootImage().getLinkedImage("debugOverlay").contextData.text = str(event.pos)
+        #self.img.getRootImage().getLinkedImage("debugOverlay").getPainter("backing").getContext().color = ((r,g,b, 10))
+        self.img.getRootImage().getLinkedImage("debugOverlay").getPainter("Text").getContext().text = str(event.pos)
 
     def linkImages(self, parentImage):
         Face.linkImages(self, parentImage)
