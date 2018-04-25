@@ -9,6 +9,12 @@ class Itterator:
         for item in self.items:
             action(item, self)
 
+    def getItems(self):
+        return self.items
+
+    def elements(self):
+        return len(self.items)
+
     def addItem(self, item):
         self.items += [item]
 

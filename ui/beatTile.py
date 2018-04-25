@@ -73,10 +73,6 @@ class BeatTile(UIElement):
         self.background.play(1)
         self.ColourChange.play(1)
 
-    def onMouseEnter(self, event):
-        self.background.time = 100
-        self.ColourChange.play(1)
-
     def onKeyUp(self, event):
         if(event.key == self.key):
             self.beat()

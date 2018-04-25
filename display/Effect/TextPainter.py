@@ -14,6 +14,10 @@ class TextPainter(Painter):
             "text"       : ""
         })
         self.contextData.addContextListner("text", self.textUpdate)
+        self.contextData.addContextListner("font_color", self.textUpdate)
+        self.contextData.addContextListner("font", self.textUpdate)
+        self.contextData.addContextListner("font_size", self.textUpdate)
+        self.contextData.addContextListner("text_pos", self.textUpdate)
 
     def textUpdate(self, old, new):
         self.boundImage.repaint()

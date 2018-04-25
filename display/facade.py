@@ -53,11 +53,16 @@ class Face(Facade, Itterator):
         item.parent = self
         self.renderItems += [item]
         item.onAdded(self)
+        self.onItemAdded(item)
+
+    def onItemAdded(self, item):
+        pass
 
     def linkChildImages(self, item, ittr):
         item.linkImages(self.childLayer)
 
     def linkImages(self, parentImage):
-        parentImage.linkImage("containerChildren", self.childLayer)
+        Facade.linkImages(self, parentImage)
+        parentImage.linkImage("childLayer",self.childLayer)
         self.every(self.linkChildImages)
         pass

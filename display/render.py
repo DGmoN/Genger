@@ -13,22 +13,22 @@ class Display(Image):
 
     IMAGEREGISTRY = ImageRegistry()
 
-    DEBUG_OVERLAY = Image((300,300))
+    DEBUG_OVERLAY = Image((800,600))
 
     DebugContext = Context()
 
     def create_image(self):
         self.surface = pygame.display.set_mode(self.contextData.size)
         self.surface.set_colorkey(Display.TRANSPARENT)
+        self.paintSurface = self.surface.copy()
 
     def run(self):
         pygame.init()
         Display.DEBUG_OVERLAY.contextData.text = "DEBUG"
-        Display.DEBUG_OVERLAY.addPainter("backing",PlainColor((255,255,255,25)))
         Display.DEBUG_OVERLAY.addPainter("Text",TextPainter())
-        Display.DEBUG_OVERLAY.contextData.addContextListner("text", self.onTextChange)
         Window.instance.linkImages(self)
         self.linkImage("debugOverlay", Display.DEBUG_OVERLAY)
+        self.dumpRenderTree()
         self.render()
         while(True):
             Window.instance.observe(pygame.event.get())
@@ -55,15 +55,19 @@ class Window(OWindow, Face):
         g = ((x+y)/(800+600)) * 255
         b = (y/600) * 255
         #self.img.getRootImage().getLinkedImage("debugOverlay").getPainter("backing").getContext().color = ((r,g,b, 10))
-        self.img.getRootImage().getLinkedImage("debugOverlay").getPainter("Text").getContext().text = str(event.pos)
+        #self.img.getRootImage().getLinkedImage("debugOverlay").getPainter("Text").getContext().text = str(event.pos)
 
     def linkImages(self, parentImage):
-        Face.linkImages(self, parentImage)
         image = Image(None, context=self)
         self.img = image
         image.addPainter("background",PlainColor((100,100,100,100)))
-        parentImage.linkImage('WindowBackground', image)
+        parentImage.linkImage('WindowBackground', self.img)
+        Face.linkImages(self, parentImage)
         pass
+
+    def addItem(self, item):
+        Face.addItem(self, item)
+        self.addObserveable(item)
 
     def onWindowCloseRequest(self, event):
         sys.exit()
