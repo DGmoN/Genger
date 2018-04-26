@@ -4,7 +4,7 @@ from display import Context
 from display.Effect import Painter
 
 class Image:
-    def __init__(self, size, blend_flag=None, context=None):
+    def __init__(self, size=(0,0), blend_flag=None, context=None):
         self.blend_flag = blend_flag
         self.surface = None
         self.paintSurface = None
@@ -15,13 +15,15 @@ class Image:
         if not context:
             self.contextData = Context()
         else : self.contextData = context
-        if 'pos' not in self.contextData.__dict__: self.contextData.__dict__['pos'] = (0,0)
-        if 'absolutePos' not in self.contextData.__dict__: self.contextData.__dict__['absolutePos'] = (0,0)
-        if 'size' not in self.contextData.__dict__:
-            if size:  self.contextData.__dict__['size'] = size
-            else:   self.contextData.__dict__['size'] = (0,0)
+        self.contextData.init_context_vars({
+            "pos" : (0,0),
+            "absolutePos" : (0,0),
+            "size" : size,
+            "scroll": (0,0)
+        })
         self.contextData.addContextListner("pos", self.onPosChange)
         self.contextData.addContextListner("size", self.onSizeChange)
+        self.queReblit = True
 
     def getSuperImage(self):
         return self.superImage
@@ -71,7 +73,7 @@ class Image:
     def addPainter(self, id, painter:Painter):
         self.painters[id] = painter
         painter.boundImage = self
-        return painter.contextData
+        return painter
 
     def getPainter(self, id):
         if(id in self.painters):
@@ -100,8 +102,10 @@ class Image:
     def blitLayers(self):
         if not (pygame.display.get_init()):
             return
-        depth = self.getDepth()
-        print("-"*depth,"blitting: ",self)
+
+        if not (self.queReblit): return
+        #depth = self.getDepth()
+        #print("-"*depth,"blitting: ",self)
         if not (self.surface): self.create_image()
         self.surface.fill((0,0,0,0))
         self.surface.blit(self.paintSurface, (0,0))
@@ -109,13 +113,14 @@ class Image:
             img = self.linkedImages[e]
             if(img.getSurface()):
                 self.surface.blit(img.getSurface(), img.getContext().absolutePos)
+        self.queReblit = False
 
     def applyPainters(self):
-        depth = self.getDepth()
-        print("-"*depth,"painting: ",self)
+        #depth = self.getDepth()
+        #print("-"*depth,"painting: ",self)
         self.paintSurface.fill((0,0,0,0))
         for i, e in self.painters.items():
-            print("-"*(depth+1),"painter: ",i)
+            #print("-"*(depth+1),"painter: ",i)
             e.apply(self.paintSurface)
 
     def onPosChange(self, old, new):
@@ -123,11 +128,11 @@ class Image:
         pass
 
     def reblit(self):
-        self.blitLayers()
+        self.queReblit = True
         if(self.superImage): self.superImage.reblit()
 
     def repaint(self):
-        print("repaint", self)
+        #print("repaint", self)
         if not(self.surface): return
         self.applyPainters()
         self.reblit()
@@ -136,10 +141,16 @@ class Image:
     def render(self):
         if not (pygame.display.get_init()):
             return
-        depth = self.getDepth()
-        print("-"*depth,"rendering: ",self.contextData)
+        #depth = self.getDepth()
+        #print("-"*depth,"rendering: ",self.contextData)
         self.create_image()
         self.applyPainters()
         for e, i in self.linkedImages.items():
             i.render()
+        self.blitLayers()
+
+    def maintain(self):
+        for e, i in self.linkedImages.items():
+            if(i.queReblit):
+                i.maintain()
         self.blitLayers()

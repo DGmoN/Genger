@@ -15,7 +15,14 @@ class Display(Image):
 
     DEBUG_OVERLAY = Image((800,600))
 
-    DebugContext = Context()
+    ANIMATION_CONTEXT = Context()
+    CLOCK = pygame.time.Clock()
+
+    def __init__(self, size):
+        Image.__init__(self, size)
+        Display.ANIMATION_CONTEXT.init_context_vars({
+        "lastTick" : 0
+        })
 
     def create_image(self):
         self.surface = pygame.display.set_mode(self.contextData.size)
@@ -24,18 +31,15 @@ class Display(Image):
 
     def run(self):
         pygame.init()
-        Display.DEBUG_OVERLAY.contextData.text = "DEBUG"
-        Display.DEBUG_OVERLAY.addPainter("Text",TextPainter())
         Window.instance.linkImages(self)
-        self.linkImage("debugOverlay", Display.DEBUG_OVERLAY)
         self.dumpRenderTree()
         self.render()
         while(True):
             Window.instance.observe(pygame.event.get())
+            self.maintain()
             pygame.display.flip()
-
-    def onTextChange(self, old, new):
-        Display.DEBUG_OVERLAY.repaint()
+            Display.ANIMATION_CONTEXT.lastTick = Display.CLOCK.tick()
+            pygame.display.set_caption(str(Display.CLOCK.get_fps()))
 
 class Window(OWindow, Face):
 

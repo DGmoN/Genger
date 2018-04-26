@@ -52,6 +52,12 @@ class Frame:
         x, y = self.pos
         return y
 
+    def setX(self, x):
+        self.pos = (x, self.getY())
+
+    def setY(self, y):
+        self.pos = (self.getX(), y)
+
     def getWidth(self):
         w, h = self.size
         return w

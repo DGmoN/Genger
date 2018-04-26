@@ -4,6 +4,7 @@ class Context:
         self.hasChanged = False
 
     def addContextListner(self, name, function):
+        print("adding context event: ", name, self)
         if(name in self.__dict__):
             if(name in self.contextListners):
                 self.contextListners[name] += [function]
@@ -14,7 +15,7 @@ class Context:
         if("contextListners" in self.__dict__):
             if(name in self.contextListners):
                 self.hasChanged = True
-                print("Context changed: ", name, new)
+                #print("Context changed: ", name, new)
                 for f in self.contextListners[name]:
                     if(f):
                         f(old, new)

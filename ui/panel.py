@@ -1,6 +1,7 @@
 from display import Face
 from manage import MouseObservable
 from ui import UIElement, Layout
+from display.Effect import Animation
 import pygame
 
 class Panel(UIElement):
@@ -14,7 +15,6 @@ class Panel(UIElement):
 
     def reposition(self, old, new):
         pass
-
 
     def onItemAdded(self, item):
         self.layout.placeElements(self.getSize(), self.getItems())
