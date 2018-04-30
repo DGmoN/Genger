@@ -1,0 +1,26 @@
+import pyglet
+from common import Context
+class EntityGroup(pyglet.graphics.Group, Context):
+    def __init__(self):
+        pyglet.graphics.Group.__init__(self)
+        self.bash = pyglet.graphics.Batch()
+        self.entities = {}
+        Context.__init__(self)
+
+    def addEntity(self, entity):
+        entity.init_entity_context(self)
+        vertex = self.bash.add(entity.vertex_count, entity.target, self, *entity.get_vertex_data(self))
+        self.entities[entity] = vertex
+
+    def globalChange(self):
+        for e, v in self.entities.items():
+            e.update_verticies(v, self)
+
+    def set_state(self):
+        pyglet.graphics.Group.set_state(self)
+        for ent in self.entities:
+            ent.set_context(self)
+
+    def draw(self):
+        self.set_state()
+        self.bash.draw()
