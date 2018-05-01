@@ -9,10 +9,13 @@ class Entity:
 
     def init_entity_context(self, context):
         context.init_context_vars({
-            "abs_x" : 50,
-            "abs_y" : 50,
+            "anchor_x" : 0,
+            "anchor_y" : 0,
+            "x" : 50,
+            "y" : 50,
             "width" : 50,
-            "height": 50
+            "height": 50,
+            "color" : (255,255,255)
         })
         pass
 
@@ -21,24 +24,25 @@ class Entity:
         pass
 
     def update_verticies(self, vertexlist, context):
-        x = context.abs_x
-        y = context.abs_y
+        x = context.x + context.anchor_x
+        y = context.y + context.anchor_y
         w = context.width
         h = context.height
         vertexlist.vertices = [x, y, x+w, y, x+w,y+h,x, y+h]
+        vertexlist.colors = list(context.color)*self.vertex_count
 
     def get_entity_name(self):
         return "DEFAULT"
 
     def get_position_vertex(self, context):
-        x = context.abs_x
-        y = context.abs_y
+        x = context.x + context.anchor_x
+        y = context.y + context.anchor_y
         w = context.width
         h = context.height
         return ('v2i/dynamic', (x, y, x+w, y, x+w,y+h,x, y+h))
 
     def get_colour_vertex(self, context):
-        return ('c3B', (0, 0, 255, 0, 255, 0,0, 0, 255, 0, 255, 0))
+        return ('c3B/dynamic', (context.color*self.vertex_count))
 
     def get_vertex_data(self, context):
         return (self.get_position_vertex(context), self.get_colour_vertex(context))
@@ -53,12 +57,19 @@ class BorderEntity(Entity):
         return "DEFAULT_BORDERED"
 
     def get_colour_vertex(self, context):
-        return ('c3B', ((255, 0, 0)*self.vertex_count))
+        return ('c3B', (context.border_color*self.vertex_count))
 
     def init_entity_context(self, context):
         Entity.init_entity_context(self, context)
         context.init_context_vars({
-            "border_width" : 2
+            "anchor_x" : 0,
+            "anchor_y" : 0,
+            "x" : 50,
+            "y" : 50,
+            "width" : 50,
+            "height": 50,
+            "border_width" : 2,
+            "border_color" : (100, 100, 100)
         })
         pass
 
@@ -67,8 +78,8 @@ class BorderEntity(Entity):
         pass
 
     def update_verticies(self, vertexlist, context):
-        x = context.abs_x
-        y = context.abs_y
+        x = context.x + context.anchor_x
+        y = context.y + context.anchor_y
         w = context.width
         h = context.height
         thick = context.border_width
@@ -79,8 +90,8 @@ class BorderEntity(Entity):
                                 x + int(thick/2),      y,      x+int(thick/2),   y+h]
 
     def get_position_vertex(self, context):
-        x = context.abs_x
-        y = context.abs_y
+        x = context.x + context.anchor_x
+        y = context.y + context.anchor_y
         w = context.width
         h = context.height
         thick = context.border_width

@@ -36,8 +36,10 @@ class Context:
             print(e, " = ", self.__dict__[e])
 
     def __setattr__(self, name, value):
+        if not("contextListners" in self.__dict__):
+            super.__setattr__(self, name, value)
+            return
         try:
-
             if(name in self.__dict__):
                 old = self.__dict__[name]
                 self.__dict__[name] = value
